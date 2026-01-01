@@ -32,12 +32,12 @@ This application is designed to manage rental properties, tenants, and associate
 - Deleting a utility type removes it from all utility providers that use it
 
 ### Utility Provider Configuration
-- Each utility provider entity has a **forecast behavior** property that determines what happens when no new forecast is received - ✅ Implemented:
-  - **Zero After Expiry**: After the forecast period expires, if no new forecast is received, payment becomes $0 for subsequent months until a new forecast arrives - ✅ Implemented
-  - **Carry Forward**: If no new forecast is received for a month, the system uses the same amounts as the previous month (carries forward the last known forecast values) - ✅ Implemented
-- Utility providers are nested under properties - ✅ Implemented
-- Multiple utility types can be assigned to each utility provider - ✅ Implemented
-- Utility providers can be created, viewed, edited, and deleted - ✅ Implemented
+- Each utility provider entity has a **forecast behavior** property that determines what happens when no new forecast is received:
+  - **Zero After Expiry**: After the forecast period expires, if no new forecast is received, payment becomes $0 for subsequent months until a new forecast arrives
+  - **Carry Forward**: If no new forecast is received for a month, the system uses the same amounts as the previous month (carries forward the last known forecast values)
+- Utility providers are nested under properties
+- Multiple utility types can be assigned to each utility provider
+- Utility providers can be created, viewed, edited, and deleted
 
 ### Payment Forecasts
 - Received from utility provider entities (frequency varies by provider, e.g., ~every 3 months, ~every 6 months)
@@ -69,16 +69,16 @@ This application is designed to manage rental properties, tenants, and associate
 ## Workflows & Features
 
 ### 1. Property & Tenant Management
-- Support multiple properties - ✅ Implemented
-- Support multiple tenants - ✅ Implemented
-- Associate tenants with properties through web interface - ✅ Implemented
-- Assign tenants to properties with rent amount configuration - ✅ Implemented
-- Edit or remove tenant-property assignments - ✅ Implemented
-- Manage rent amounts (editable per property/tenant) - ✅ Implemented
-- Create, edit, and delete properties - ✅ Implemented
-- Create, edit, and delete tenants - ✅ Implemented
-- View property details including assigned tenants and utility providers - ✅ Implemented
-- View tenant details including associated properties - ✅ Implemented
+- Support multiple properties
+- Support multiple tenants
+- Associate tenants with properties through web interface
+- Assign tenants to properties with rent amount configuration
+- Edit or remove tenant-property assignments
+- Manage rent amounts (editable per property/tenant)
+- Create, edit, and delete properties
+- Create, edit, and delete tenants
+- View property details including assigned tenants and utility providers
+- View tenant details including associated properties
 
 ### 2. Monthly Payslip Generation
 - Generate payslips for all tenants each month
