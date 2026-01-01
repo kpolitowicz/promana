@@ -24,7 +24,16 @@
   </head>
 
   <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+    <nav class="bg-blue-600 text-white p-4 fixed top-0 left-0 right-0 z-50">
+      <div class="container mx-auto flex justify-between items-center">
+        <%= link_to "Promana", root_path, class: "text-xl font-bold" %>
+        <div class="space-x-4">
+          <%= link_to "Properties", properties_path, class: "hover:text-blue-200" %>
+          <%= link_to "Tenants", tenants_path, class: "hover:text-blue-200" %>
+        </div>
+      </div>
+    </nav>
+    <main class="container mx-auto mt-20 px-5">
       <%= yield %>
     </main>
   </body>
