@@ -11,7 +11,9 @@ Rails.application.routes.draw do
 
   resources :properties do
     resources :property_tenants, only: [:new, :create, :destroy]
-    resources :utility_providers
+    resources :utility_providers do
+      resources :forecasts
+    end
   end
   resources :tenants
   resources :utility_types, only: [:index, :new, :create, :destroy]

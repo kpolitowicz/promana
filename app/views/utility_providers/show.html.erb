@@ -26,4 +26,29 @@
       <p class="text-gray-500">No utility types assigned.</p>
     <% end %>
   </div>
+
+  <div class="mt-8">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-bold text-gray-900">Forecasts</h2>
+      <%= link_to "Add Forecast", new_property_utility_provider_forecast_path(@property, @utility_provider), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+    </div>
+
+    <% if @utility_provider.forecasts.any? %>
+      <ul class="bg-white shadow rounded-lg divide-y">
+        <% @utility_provider.forecasts.order(issued_date: :desc).each do |forecast| %>
+          <li class="py-3 px-4 flex justify-between items-center">
+            <div>
+              <%= link_to "Forecast #{forecast.issued_date.strftime('%Y-%m-%d')}", property_utility_provider_forecast_path(@property, @utility_provider, forecast), class: "font-medium text-blue-600 hover:text-blue-800" %>
+              <span class="text-sm text-gray-500 ml-2">
+                <%= pluralize(forecast.forecast_line_items.count, 'line item') %>
+              </span>
+            </div>
+            <%= link_to "Delete", property_utility_provider_forecast_path(@property, @utility_provider, forecast), method: :delete, data: {confirm: "Are you sure?"}, class: "text-red-600 hover:text-red-800 leading-none inline-block" %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-gray-500">No forecasts yet.</p>
+    <% end %>
+  </div>
 </div>
