@@ -38,7 +38,7 @@ RSpec.describe "Tenants", type: :request do
 
       it "renders the new template" do
         post tenants_path, params: {tenant: {name: ""}}
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
@@ -86,7 +86,7 @@ RSpec.describe "Tenants", type: :request do
 
       it "renders the edit template" do
         patch tenant_path(tenant), params: {tenant: {name: ""}}
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end

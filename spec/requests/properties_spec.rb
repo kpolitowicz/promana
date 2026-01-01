@@ -38,7 +38,7 @@ RSpec.describe "Properties", type: :request do
 
       it "renders the new template" do
         post properties_path, params: {property: {name: ""}}
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
@@ -86,7 +86,7 @@ RSpec.describe "Properties", type: :request do
 
       it "renders the edit template" do
         patch property_path(property), params: {property: {name: ""}}
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
