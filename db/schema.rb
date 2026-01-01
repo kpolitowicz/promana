@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_01_232539) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_01_233239) do
   create_table "properties", force: :cascade do |t|
     t.text "address"
     t.datetime "created_at", null: false
@@ -37,6 +37,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_01_232539) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "utility_provider_utility_types", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "utility_provider_id", null: false
+    t.integer "utility_type_id", null: false
+    t.index ["utility_provider_id", "utility_type_id"], name: "index_utility_provider_utility_types_unique", unique: true
+    t.index ["utility_provider_id"], name: "index_utility_provider_utility_types_on_utility_provider_id"
+    t.index ["utility_type_id"], name: "index_utility_provider_utility_types_on_utility_type_id"
+  end
+
+  create_table "utility_providers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "forecast_behavior", null: false
+    t.string "name", null: false
+    t.integer "property_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["property_id", "name"], name: "index_utility_providers_on_property_id_and_name", unique: true
+    t.index ["property_id"], name: "index_utility_providers_on_property_id"
+  end
+
+  create_table "utility_types", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_utility_types_on_name", unique: true
+  end
+
   add_foreign_key "property_tenants", "properties"
   add_foreign_key "property_tenants", "tenants"
+  add_foreign_key "utility_provider_utility_types", "utility_providers"
+  add_foreign_key "utility_provider_utility_types", "utility_types"
+  add_foreign_key "utility_providers", "properties"
 end
