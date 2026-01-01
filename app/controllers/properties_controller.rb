@@ -6,6 +6,7 @@ class PropertiesController < ApplicationController
   end
 
   def show
+    @property_tenants = @property.property_tenants.includes(:tenant).order("tenants.name")
   end
 
   def new
@@ -18,7 +19,7 @@ class PropertiesController < ApplicationController
     if @property.save
       redirect_to @property, notice: "Property was successfully created."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -29,7 +30,7 @@ class PropertiesController < ApplicationController
     if @property.update(property_params)
       redirect_to @property, notice: "Property was successfully updated."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
