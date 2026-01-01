@@ -11,8 +11,10 @@ Rails.application.routes.draw do
 
   resources :properties do
     resources :property_tenants, only: [:new, :create, :destroy]
+    resources :utility_providers
   end
   resources :tenants
+  resources :utility_types, only: [:index, :new, :create, :destroy]
 
   # Defines the root path route ("/")
   root "properties#index"

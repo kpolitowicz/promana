@@ -35,4 +35,27 @@
       <p class="text-gray-500">No tenants assigned yet.</p>
     <% end %>
   </div>
+
+  <div class="mt-8">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-bold text-gray-900">Utility Providers</h2>
+      <%= link_to "Add Utility Provider", new_property_utility_provider_path(@property), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+    </div>
+
+    <% if @property.utility_providers.any? %>
+      <ul class="bg-white shadow rounded-lg divide-y">
+        <% @property.utility_providers.order(:name).each do |provider| %>
+          <li class="py-3 px-4 flex justify-between items-center">
+            <div>
+              <%= link_to provider.name, property_utility_provider_path(@property, provider), class: "font-medium text-blue-600 hover:text-blue-800" %>
+              <span class="text-sm text-gray-500 ml-2">(<%= provider.forecast_behavior.humanize %>)</span>
+            </div>
+            <%= link_to "Remove", property_utility_provider_path(@property, provider), method: :delete, data: {confirm: "Are you sure?"}, class: "text-red-600 hover:text-red-800 leading-none inline-block" %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-gray-500">No utility providers yet.</p>
+    <% end %>
+  </div>
 </div>

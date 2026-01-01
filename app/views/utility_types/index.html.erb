@@ -1,0 +1,21 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Utility Types</h1>
+    <%= link_to "New Utility Type", new_utility_type_path, class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+  </div>
+
+  <% if @utility_types.any? %>
+    <div class="bg-white shadow rounded-lg divide-y">
+      <% @utility_types.each do |utility_type| %>
+        <div class="py-3 px-4 flex justify-between items-center">
+          <span class="font-medium text-gray-900"><%= utility_type.name %></span>
+          <%= link_to "Delete", utility_type_path(utility_type), method: :delete, data: {confirm: "Are you sure?"}, class: "text-red-600 hover:text-red-800" %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-12">
+      <p class="text-gray-500">No utility types yet. <%= link_to "Create one", new_utility_type_path, class: "text-blue-600 hover:text-blue-800" %> to get started.</p>
+    </div>
+  <% end %>
+</div>
