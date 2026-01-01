@@ -56,43 +56,56 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const lineItemsContainer = document.getElementById('line-items');
-    const addButton = document.getElementById('add-line-item');
-    let lineItemIndex = <%= @forecast.forecast_line_items.size %>;
+  (function() {
+    function initLineItems() {
+      const lineItemsContainer = document.getElementById('line-items');
+      const addButton = document.getElementById('add-line-item');
+      if (!lineItemsContainer || !addButton) return;
 
-    addButton.addEventListener('click', function() {
-      const newLineItem = document.createElement('div');
-      newLineItem.className = 'line-item border rounded p-4 mb-4';
-      newLineItem.innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-gray-700 text-sm font-bold mb-2">Name</label>
-            <input type="text" name="forecast[forecast_line_items_attributes][${lineItemIndex}][name]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., Forecast, Rozliczenie">
-          </div>
-          <div>
-            <label class="block text-gray-700 text-sm font-bold mb-2">Amount</label>
-            <input type="number" step="0.01" name="forecast[forecast_line_items_attributes][${lineItemIndex}][amount]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-          </div>
-          <div>
-            <label class="block text-gray-700 text-sm font-bold mb-2">Due Date</label>
-            <input type="date" name="forecast[forecast_line_items_attributes][${lineItemIndex}][due_date]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            <button type="button" class="remove-line-item text-red-600 hover:text-red-800 mt-2">Remove</button>
-          </div>
-        </div>
-      `;
-      lineItemsContainer.appendChild(newLineItem);
-      lineItemIndex++;
+      let lineItemIndex = <%= @forecast.forecast_line_items.size %>;
 
-      newLineItem.querySelector('.remove-line-item').addEventListener('click', function() {
-        newLineItem.remove();
+      addButton.addEventListener('click', function() {
+        const newLineItem = document.createElement('div');
+        newLineItem.className = 'line-item border rounded p-4 mb-4';
+        newLineItem.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2">Name</label>
+              <input type="text" name="forecast[forecast_line_items_attributes][${lineItemIndex}][name]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., Forecast, Rozliczenie">
+            </div>
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2">Amount</label>
+              <input type="number" step="0.01" name="forecast[forecast_line_items_attributes][${lineItemIndex}][amount]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2">Due Date</label>
+              <input type="date" name="forecast[forecast_line_items_attributes][${lineItemIndex}][due_date]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              <button type="button" class="remove-line-item text-red-600 hover:text-red-800 mt-2">Remove</button>
+            </div>
+          </div>
+        `;
+        lineItemsContainer.appendChild(newLineItem);
+        lineItemIndex++;
+
+        newLineItem.querySelector('.remove-line-item').addEventListener('click', function() {
+          newLineItem.remove();
+        });
       });
-    });
 
-    document.querySelectorAll('.remove-line-item').forEach(function(button) {
-      button.addEventListener('click', function() {
-        this.closest('.line-item').remove();
+      document.querySelectorAll('.remove-line-item').forEach(function(button) {
+        button.addEventListener('click', function() {
+          this.closest('.line-item').remove();
+        });
       });
-    });
-  });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initLineItems);
+    } else {
+      initLineItems();
+    }
+
+    document.addEventListener('turbo:load', initLineItems);
+    document.addEventListener('turbo:render', initLineItems);
+  })();
 </script>
