@@ -108,10 +108,13 @@ This application is designed to manage rental properties, tenants, and associate
 ### 4. Forecast Entry
 - System must allow entry of payment forecasts from any utility provider entity through web interface
 - Each property can have multiple utility providers
-- Forecasts can span multiple months
-- **Itemized Forecast Entry**: For utility providers managing multiple utility types, the system must support entering itemized forecasts with individual line items for each utility type (e.g., waste: $X, water: $Y, heating: $Z)
-- All line items within an itemized forecast must be enterable and trackable separately
-- Forecasts affect tenant payslip calculations for future months
+- Forecasts have an issued date
+- **Forecast Line Items**: Each forecast can have multiple line items with:
+  - Name (e.g., "Forecast", "Rozliczenie" for settlement/differences)
+  - Amount (can be positive, negative, or zero - negative amounts represent refunds/credits)
+  - Due date (payment due date)
+- All line items within a forecast must be enterable and trackable separately
+- Line items can be added or removed dynamically through the web interface
 - Forecasts can be updated or corrected
 - Create, edit, and delete forecasts through web interface
 
