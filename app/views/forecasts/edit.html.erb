@@ -29,44 +29,13 @@
       </div>
       <div data-nested-form-target="container" id="line-items">
         <%= form.fields_for :forecast_line_items do |line_item_form| %>
-          <div class="line-item border rounded p-4 mb-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <%= line_item_form.label :name, "Name", class: "block text-gray-700 text-sm font-bold mb-2" %>
-                <%= line_item_form.text_field :name, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", placeholder: "e.g., Forecast, Rozliczenie" %>
-              </div>
-              <div>
-                <%= line_item_form.label :amount, "Amount", class: "block text-gray-700 text-sm font-bold mb-2" %>
-                <%= line_item_form.number_field :amount, step: 0.01, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
-              </div>
-              <div>
-                <%= line_item_form.label :due_date, "Due Date", class: "block text-gray-700 text-sm font-bold mb-2" %>
-                <%= line_item_form.date_field :due_date, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
-                <%= line_item_form.check_box :_destroy, class: "hidden" %>
-                <button type="button" data-action="click->nested-form#remove" class="text-red-600 hover:text-red-800 mt-2">Remove</button>
-              </div>
-            </div>
-          </div>
+          <%= render "forecast_line_item_fields", form: line_item_form %>
         <% end %>
       </div>
       <template data-nested-form-target="template">
-        <div class="line-item border rounded p-4 mb-4">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-gray-700 text-sm font-bold mb-2">Name</label>
-              <input type="text" name="forecast[forecast_line_items_attributes][NEW_RECORD][name]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., Forecast, Rozliczenie">
-            </div>
-            <div>
-              <label class="block text-gray-700 text-sm font-bold mb-2">Amount</label>
-              <input type="number" step="0.01" name="forecast[forecast_line_items_attributes][NEW_RECORD][amount]" value="0" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            </div>
-            <div>
-              <label class="block text-gray-700 text-sm font-bold mb-2">Due Date</label>
-              <input type="date" name="forecast[forecast_line_items_attributes][NEW_RECORD][due_date]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-              <button type="button" data-action="click->nested-form#remove" class="text-red-600 hover:text-red-800 mt-2">Remove</button>
-            </div>
-          </div>
-        </div>
+        <%= form.fields_for :forecast_line_items, ForecastLineItem.new, child_index: "NEW_RECORD" do |line_item_form| %>
+          <%= render "forecast_line_item_fields", form: line_item_form %>
+        <% end %>
       </template>
     </div>
 
