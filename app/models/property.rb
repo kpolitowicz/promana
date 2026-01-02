@@ -3,6 +3,7 @@ class Property < ApplicationRecord
   has_many :tenants, through: :property_tenants
   has_many :utility_providers, dependent: :destroy
   has_many :forecasts, dependent: :destroy
+  has_many :payslips, dependent: :destroy
 
   validates :name, presence: true
 end

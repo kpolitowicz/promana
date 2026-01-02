@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_01_235127) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_02_001822) do
   create_table "forecast_line_items", force: :cascade do |t|
     t.decimal "amount", precision: 10, scale: 2, null: false
     t.datetime "created_at", null: false
@@ -29,6 +29,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_01_235127) do
     t.integer "utility_provider_id", null: false
     t.index ["property_id"], name: "index_forecasts_on_property_id"
     t.index ["utility_provider_id"], name: "index_forecasts_on_utility_provider_id"
+  end
+
+  create_table "payslip_line_items", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "payslip_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["payslip_id"], name: "index_payslip_line_items_on_payslip_id"
+  end
+
+  create_table "payslips", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "due_date"
+    t.date "month"
+    t.integer "property_id", null: false
+    t.integer "property_tenant_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["property_id"], name: "index_payslips_on_property_id"
+    t.index ["property_tenant_id"], name: "index_payslips_on_property_tenant_id"
   end
 
   create_table "properties", force: :cascade do |t|
@@ -87,6 +107,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_01_235127) do
   add_foreign_key "forecast_line_items", "forecasts"
   add_foreign_key "forecasts", "properties"
   add_foreign_key "forecasts", "utility_providers"
+  add_foreign_key "payslip_line_items", "payslips"
+  add_foreign_key "payslips", "properties"
+  add_foreign_key "payslips", "property_tenants"
   add_foreign_key "property_tenants", "properties"
   add_foreign_key "property_tenants", "tenants"
   add_foreign_key "utility_provider_utility_types", "utility_providers"

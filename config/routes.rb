@@ -10,7 +10,9 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   resources :properties do
-    resources :property_tenants, only: [:new, :create, :destroy]
+    resources :property_tenants, only: [:new, :create, :destroy] do
+      resources :payslips, only: [:index, :new, :create, :show, :destroy]
+    end
     resources :utility_providers do
       resources :forecasts
     end

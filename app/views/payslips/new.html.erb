@@ -1,0 +1,67 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Generate Payslip</h1>
+    <p class="mt-1 text-sm text-gray-500">
+      Tenant: <%= @property_tenant.tenant.name %> | Property: <%= link_to @property.name, property_path(@property), class: "text-blue-600 hover:text-blue-800" %>
+    </p>
+  </div>
+
+  <%= form_with(model: [@property, @property_tenant, @payslip], local: true, class: "bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4") do |form| %>
+    <% if @payslip.errors.any? %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <h2 class="font-bold"><%= pluralize(@payslip.errors.count, "error") %> prohibited this payslip from being saved:</h2>
+        <ul class="list-disc list-inside">
+          <% @payslip.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div>
+        <%= form.label :month, "Month", class: "block text-gray-700 text-sm font-bold mb-2" %>
+        <%= form.date_field :month, value: @payslip.month, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+      </div>
+      <div>
+        <%= form.label :due_date, "Due Date", class: "block text-gray-700 text-sm font-bold mb-2" %>
+        <%= form.date_field :due_date, value: @payslip.due_date, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Line Items</h2>
+      <div class="bg-white shadow rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @payslip_data[:line_items].each_with_index do |line_item, index| %>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= line_item[:name] %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= format_currency(line_item[:amount]) %>
+                  <%= hidden_field_tag "line_items[][name]", line_item[:name] %>
+                  <%= hidden_field_tag "line_items[][amount]", line_item[:amount] %>
+                </td>
+              </tr>
+            <% end %>
+            <tr class="bg-gray-50 font-bold">
+              <td class="px-6 py-4 whitespace-nowrap text-sm">Total</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm"><%= format_currency(@payslip_data[:line_items].sum { |item| item[:amount] }) %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <%= form.submit "Save Payslip", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+      <%= link_to "Cancel", property_property_tenant_payslips_path(@property, @property_tenant), class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" %>
+    </div>
+  <% end %>
+</div>
