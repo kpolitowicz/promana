@@ -157,6 +157,19 @@ This application is designed to manage rental properties, tenants, and associate
   - Multiple payments in the same month are automatically summed
   - No difference line item is added if payments exactly match the payslip total
   - Payment differences are configurable via Payslip model class methods
+- **Automatic Forecast Adjustment Calculation**:
+  - **Critical Workflow**: New forecasts are often received AFTER payslips have been generated for that month
+  - When generating a payslip, the system automatically:
+    - Finds the previous month's payslip (if it exists)
+    - For each utility provider, extracts what amounts were included in the previous payslip
+    - Finds the most recent forecast for that month (preferring forecasts issued after the payslip was created)
+    - Calculates the difference between payslip amounts and new forecast amounts for each line item
+    - Sums all differences across all utility providers
+    - Includes an adjustment line item (Wyrównanie) in the current month's payslip if the total difference is non-zero
+  - Adjustments account for changes in forecast amounts after payslip generation
+  - Positive adjustments indicate undercharging (tenant owes more)
+  - Negative adjustments indicate overcharging (credit to tenant)
+  - Forecast adjustments are configurable via Payslip model class methods
 
 ### 6. Vendor Payment Reports
 - Generate monthly reports showing amounts owed to each utility provider entity
