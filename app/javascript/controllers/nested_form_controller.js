@@ -10,9 +10,9 @@ export default class extends Controller {
 
   add(event) {
     event.preventDefault()
-    const content = this.templateTarget.innerHTML.replace(/NEW_RECORD/g, this.indexValue)
+    const timestamp = Date.now()
+    const content = this.templateTarget.innerHTML.replace(/NEW_RECORD/g, timestamp)
     this.containerTarget.insertAdjacentHTML("beforeend", content)
-    this.indexValue++
   }
 
   remove(event) {
