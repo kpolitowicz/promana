@@ -242,6 +242,9 @@ Utility Provider Entity
   - `CURRENCY_SYMBOL`: Currency symbol (default: "zł" for PLN)
   - `CURRENCY_POSITION`: Position of symbol relative to amount - "before" or "after" (default: "after")
   - Configured in `config/initializers/currency.rb`
+- **Payslip Configuration**: Configurable labels in Payslip model:
+  - Header labels: `name_header` (default: "Pozycja"), `amount_header` (default: "Kwota"), `total_header` (default: "Razem")
+  - Payment difference labels: `underpayment_label` (default: "Zaległe"), `overpayment_label` (default: "Nadpłata")
 
 ## Future Considerations
 
