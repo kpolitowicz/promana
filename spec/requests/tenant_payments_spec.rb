@@ -12,8 +12,8 @@ RSpec.describe "TenantPayments", type: :request do
     end
 
     it "displays all tenant payments" do
-      payment1 = TenantPayment.create!(property_tenant: property_tenant, property: property, month: Date.today.beginning_of_month, amount: 1000.00, paid_date: Date.today)
-      payment2 = TenantPayment.create!(property_tenant: property_tenant, property: property, month: (Date.today - 1.month).beginning_of_month, amount: 1200.00, paid_date: Date.today - 10.days)
+      TenantPayment.create!(property_tenant: property_tenant, property: property, month: Date.today.beginning_of_month, amount: 1000.00, paid_date: Date.today)
+      TenantPayment.create!(property_tenant: property_tenant, property: property, month: (Date.today - 1.month).beginning_of_month, amount: 1200.00, paid_date: Date.today - 10.days)
 
       get property_property_tenant_tenant_payments_path(property, property_tenant)
       expect(response).to have_http_status(:success)
