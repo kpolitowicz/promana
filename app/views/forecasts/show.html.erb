@@ -32,13 +32,13 @@
             <% @forecast.forecast_line_items.each do |line_item| %>
               <tr>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= line_item.name %></td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$<%= number_with_precision(line_item.amount, precision: 2) %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_currency(line_item.amount) %></td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= line_item.due_date.strftime('%B %d, %Y') %></td>
               </tr>
             <% end %>
             <tr class="bg-gray-50 font-bold">
               <td class="px-6 py-4 whitespace-nowrap text-sm">Total</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm">$<%= number_with_precision(@forecast.forecast_line_items.sum(:amount), precision: 2) %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm"><%= format_currency(@forecast.forecast_line_items.sum(:amount)) %></td>
               <td class="px-6 py-4 whitespace-nowrap text-sm"></td>
             </tr>
           </tbody>

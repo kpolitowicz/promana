@@ -209,6 +209,10 @@ Vendor Payments
 - **Testing**: RSpec for comprehensive test coverage
 - **Code Quality**: StandardRB for Ruby code style enforcement
 - **Architecture**: Service objects for complex business logic (ForecastCalculator, PayslipGenerator)
+- **Currency Configuration**: Configurable currency symbol and position (before/after amount) via environment variables:
+  - `CURRENCY_SYMBOL`: Currency symbol (default: "$")
+  - `CURRENCY_POSITION`: Position of symbol relative to amount - "before" or "after" (default: "before")
+  - Configured in `config/initializers/currency.rb`
 
 ## Future Considerations
 
