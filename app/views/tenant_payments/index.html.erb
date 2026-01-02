@@ -30,7 +30,7 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm">
                 <%= link_to "View", property_property_tenant_tenant_payment_path(@property, @property_tenant, payment), class: "text-blue-600 hover:text-blue-800 mr-4" %>
                 <%= link_to "Edit", edit_property_property_tenant_tenant_payment_path(@property, @property_tenant, payment), class: "text-gray-600 hover:text-gray-800 mr-4" %>
-                <%= button_to "Delete", property_property_tenant_tenant_payment_path(@property, @property_tenant, payment), method: :delete, data: {confirm: "Are you sure?"}, class: "text-red-600 hover:text-red-800 leading-none inline-block bg-transparent border-0 p-0 cursor-pointer font-normal" %>
+                <%= button_to "Delete", property_property_tenant_tenant_payment_path(@property, @property_tenant, payment), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800 leading-none inline-block bg-transparent border-0 p-0 cursor-pointer font-normal" %>
               </td>
             </tr>
           <% end %>

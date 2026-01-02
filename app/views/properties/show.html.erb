@@ -30,7 +30,7 @@
             <div class="flex items-center gap-2">
               <%= link_to "Payslips", property_property_tenant_payslips_path(@property, property_tenant), class: "text-blue-600 hover:text-blue-800 leading-none inline-block" %>
               <%= link_to "Payments", property_property_tenant_tenant_payments_path(@property, property_tenant), class: "text-blue-600 hover:text-blue-800 leading-none inline-block" %>
-              <%= button_to "Remove", property_property_tenant_path(@property, property_tenant), method: :delete, data: {confirm: "Are you sure?"}, class: "text-red-600 hover:text-red-800 leading-none inline-block border-0 bg-transparent cursor-pointer p-0" %>
+              <%= button_to "Remove", property_property_tenant_path(@property, property_tenant), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800 leading-none inline-block border-0 bg-transparent cursor-pointer p-0" %>
             </div>
           </li>
         <% end %>
@@ -54,7 +54,7 @@
               <%= link_to provider.name, property_utility_provider_path(@property, provider), class: "font-medium text-blue-600 hover:text-blue-800" %>
               <span class="text-sm text-gray-500 ml-2">(<%= provider.forecast_behavior.humanize %>)</span>
             </div>
-            <%= button_to "Remove", property_utility_provider_path(@property, provider), method: :delete, data: {confirm: "Are you sure?"}, class: "text-red-600 hover:text-red-800 leading-none inline-block border-0 bg-transparent cursor-pointer p-0" %>
+            <%= button_to "Remove", property_utility_provider_path(@property, provider), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800 leading-none inline-block border-0 bg-transparent cursor-pointer p-0" %>
           </li>
         <% end %>
       </ul>
