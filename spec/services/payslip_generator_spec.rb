@@ -22,27 +22,31 @@ RSpec.describe PayslipGenerator do
       let(:utility_provider) { UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property) }
       let(:forecast) { Forecast.create!(utility_provider: utility_provider, property: property, issued_date: Date.today) }
 
-      it "includes utility amount from active forecast" do
+      it "includes each forecast line item individually" do
         ForecastLineItem.create!(forecast: forecast, name: "Forecast", amount: 250.00, due_date: target_month + 5.days)
 
         generator = PayslipGenerator.new(property_tenant, month: target_month)
         result = generator.generate
 
         expect(result[:line_items].length).to eq(2)
-        expect(result[:line_items].map { |item| item[:name] }).to contain_exactly("Rent", "Test Provider")
-        utility_item = result[:line_items].find { |item| item[:name] == "Test Provider" }
+        expect(result[:line_items].map { |item| item[:name] }).to contain_exactly("Rent", "Test Provider - Forecast")
+        utility_item = result[:line_items].find { |item| item[:name] == "Test Provider - Forecast" }
         expect(utility_item[:amount]).to eq(250.00)
       end
 
-      it "sums multiple line items from active forecast" do
+      it "includes all line items from active forecast as separate items" do
         ForecastLineItem.create!(forecast: forecast, name: "Forecast", amount: 200.00, due_date: target_month + 5.days)
         ForecastLineItem.create!(forecast: forecast, name: "Rozliczenie", amount: 50.00, due_date: target_month + 10.days)
 
         generator = PayslipGenerator.new(property_tenant, month: target_month)
         result = generator.generate
 
-        utility_item = result[:line_items].find { |item| item[:name] == "Test Provider" }
-        expect(utility_item[:amount]).to eq(250.00)
+        expect(result[:line_items].length).to eq(3)
+        expect(result[:line_items].map { |item| item[:name] }).to contain_exactly("Rent", "Test Provider - Forecast", "Test Provider - Rozliczenie")
+        forecast_item = result[:line_items].find { |item| item[:name] == "Test Provider - Forecast" }
+        rozliczenie_item = result[:line_items].find { |item| item[:name] == "Test Provider - Rozliczenie" }
+        expect(forecast_item[:amount]).to eq(200.00)
+        expect(rozliczenie_item[:amount]).to eq(50.00)
       end
     end
 
@@ -62,13 +66,13 @@ RSpec.describe PayslipGenerator do
       let(:utility_provider) { UtilityProvider.create!(name: "Test Provider", forecast_behavior: "carry_forward", property: property) }
       let(:old_forecast) { Forecast.create!(utility_provider: utility_provider, property: property, issued_date: Date.today - 2.months) }
 
-      it "carries forward amount from last forecast" do
+      it "carries forward line items from last forecast" do
         ForecastLineItem.create!(forecast: old_forecast, name: "Forecast", amount: 300.00, due_date: Date.today.beginning_of_month - 5.days)
 
         generator = PayslipGenerator.new(property_tenant, month: target_month)
         result = generator.generate
 
-        utility_item = result[:line_items].find { |item| item[:name] == "Test Provider" }
+        utility_item = result[:line_items].find { |item| item[:name] == "Test Provider - Forecast" }
         expect(utility_item[:amount]).to eq(300.00)
       end
 
@@ -87,7 +91,7 @@ RSpec.describe PayslipGenerator do
       let(:forecast1) { Forecast.create!(utility_provider: provider1, property: property, issued_date: Date.today) }
       let(:old_forecast2) { Forecast.create!(utility_provider: provider2, property: property, issued_date: Date.today - 2.months) }
 
-      it "includes utilities from all providers" do
+      it "includes all forecast line items from all providers" do
         ForecastLineItem.create!(forecast: forecast1, name: "Forecast", amount: 150.00, due_date: target_month + 5.days)
         ForecastLineItem.create!(forecast: old_forecast2, name: "Forecast", amount: 200.00, due_date: Date.today.beginning_of_month - 5.days)
 
@@ -95,7 +99,7 @@ RSpec.describe PayslipGenerator do
         result = generator.generate
 
         expect(result[:line_items].length).to eq(3)
-        expect(result[:line_items].map { |item| item[:name] }).to contain_exactly("Rent", "Provider 1", "Provider 2")
+        expect(result[:line_items].map { |item| item[:name] }).to contain_exactly("Rent", "Provider 1 - Forecast", "Provider 2 - Forecast")
       end
     end
 

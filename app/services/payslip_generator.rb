@@ -17,11 +17,11 @@ class PayslipGenerator
 
     # Add utility line items from each utility provider
     @property.utility_providers.each do |utility_provider|
-      utility_amount = calculate_utility_amount(utility_provider, @month)
-      if utility_amount != 0
+      forecast_line_items = find_forecast_line_items(utility_provider, @month)
+      forecast_line_items.each do |line_item|
         line_items << {
-          name: utility_provider.name,
-          amount: utility_amount
+          name: "#{utility_provider.name} - #{line_item.name}",
+          amount: line_item.amount
         }
       end
     end
@@ -37,41 +37,33 @@ class PayslipGenerator
 
   private
 
-  def calculate_utility_amount(utility_provider, target_month)
-    # Find forecasts with line items that have due_date in the target month
-    active_forecast = find_active_forecast(utility_provider, target_month)
+  def find_forecast_line_items(utility_provider, target_month)
+    # Find all forecast line items that have due_date in the target month
+    active_line_items = ForecastLineItem.joins(:forecast)
+      .where(forecasts: {utility_provider_id: utility_provider.id})
+      .where("forecast_line_items.due_date >= ? AND forecast_line_items.due_date < ?",
+        target_month.beginning_of_month,
+        target_month.next_month.beginning_of_month)
 
-    if active_forecast
-      # Sum all line items from the active forecast
-      active_forecast.forecast_line_items.sum(:amount)
+    if active_line_items.any?
+      active_line_items
     else
-      # No active forecast - apply forecast behavior
+      # No active forecast line items - apply forecast behavior
       case utility_provider.forecast_behavior
       when "zero_after_expiry"
-        0
+        ForecastLineItem.none
       when "carry_forward"
         # Find the most recent forecast before the target month
         last_forecast = find_last_forecast(utility_provider, target_month)
         if last_forecast
-          last_forecast.forecast_line_items.sum(:amount)
+          last_forecast.forecast_line_items
         else
-          0
+          ForecastLineItem.none
         end
       else
-        0
+        ForecastLineItem.none
       end
     end
-  end
-
-  def find_active_forecast(utility_provider, target_month)
-    # Find forecasts where at least one line item's due_date falls in the target month
-    utility_provider.forecasts.joins(:forecast_line_items)
-      .where("forecast_line_items.due_date >= ? AND forecast_line_items.due_date < ?",
-        target_month.beginning_of_month,
-        target_month.next_month.beginning_of_month)
-      .distinct
-      .order(issued_date: :desc)
-      .first
   end
 
   def find_last_forecast(utility_provider, target_month)
