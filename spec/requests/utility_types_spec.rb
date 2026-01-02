@@ -59,7 +59,7 @@ RSpec.describe "UtilityTypes", type: :request do
   end
 
   describe "DELETE /utility_types/:id" do
-    let(:utility_type) { utility_types(:utility_type_energia) }
+    let(:utility_type) { utility_types(:utility_type_energy) }
 
     it "destroys the utility type" do
       expect {

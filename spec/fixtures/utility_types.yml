@@ -1,8 +1,8 @@
 # Utility Types fixtures
-utility_type_energia:
+utility_type_energy:
   name: "Energy"
 
-utility_type_zarzadca:
+utility_type_property_management:
   name: "Property Management"
 
 utility_type_heating:
