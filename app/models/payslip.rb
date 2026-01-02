@@ -16,4 +16,17 @@ class Payslip < ApplicationRecord
   def tenant
     property_tenant.tenant
   end
+
+  # Configurable header labels for payslip display
+  def self.name_header
+    "Pozycja"
+  end
+
+  def self.amount_header
+    "Kwota"
+  end
+
+  def self.total_header
+    "Razem"
+  end
 end
