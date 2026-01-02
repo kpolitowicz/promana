@@ -210,8 +210,8 @@ Vendor Payments
 - **Code Quality**: StandardRB for Ruby code style enforcement
 - **Architecture**: Service objects for complex business logic (ForecastCalculator, PayslipGenerator)
 - **Currency Configuration**: Configurable currency symbol and position (before/after amount) via environment variables:
-  - `CURRENCY_SYMBOL`: Currency symbol (default: "$")
-  - `CURRENCY_POSITION`: Position of symbol relative to amount - "before" or "after" (default: "before")
+  - `CURRENCY_SYMBOL`: Currency symbol (default: "zł" for PLN)
+  - `CURRENCY_POSITION`: Position of symbol relative to amount - "before" or "after" (default: "after")
   - Configured in `config/initializers/currency.rb`
 
 ## Future Considerations
