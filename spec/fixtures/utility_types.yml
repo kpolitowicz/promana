@@ -1,9 +1,9 @@
 # Utility Types fixtures
 utility_type_energia:
-  name: "Energia"
+  name: "Energy"
 
 utility_type_zarzadca:
-  name: "Zarządca"
+  name: "Property Management"
 
 utility_type_heating:
   name: "Heating"
