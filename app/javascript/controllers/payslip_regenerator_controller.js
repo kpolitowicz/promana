@@ -22,17 +22,17 @@ export default class extends Controller {
       if (month) {
         // If month changed, update due_date to same month (keeping day and year)
         if (dueDate) {
-          const dueDateObj = new Date(dueDate)
-          const monthObj = new Date(month)
+          // Parse dates as local dates to avoid timezone issues
+          const monthParts = month.split('-')
+          const dueDateParts = dueDate.split('-')
           
-          // Set due_date to same month as month field, keeping the day
-          dueDateObj.setMonth(monthObj.getMonth())
-          dueDateObj.setFullYear(monthObj.getFullYear())
+          // Extract year and month from month field, day from due_date
+          const newYear = parseInt(monthParts[0], 10)
+          const newMonth = parseInt(monthParts[1], 10)
+          const day = parseInt(dueDateParts[2], 10)
           
-          // Format as YYYY-MM-DD
-          const day = dueDateObj.getDate().toString().padStart(2, '0')
-          const monthNum = (dueDateObj.getMonth() + 1).toString().padStart(2, '0')
-          dueDate = `${dueDateObj.getFullYear()}-${monthNum}-${day}`
+          // Create new date string in YYYY-MM-DD format
+          dueDate = `${newYear}-${newMonth.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
           
           // Update the due_date field
           this.dueDateTarget.value = dueDate
