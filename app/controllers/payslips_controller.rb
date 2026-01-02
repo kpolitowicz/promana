@@ -11,38 +11,41 @@ class PayslipsController < ApplicationController
     due_date = params[:due_date].present? ? Date.parse(params[:due_date]) : Date.new(month.year, month.month, 10)
 
     generator = PayslipGenerator.new(@property_tenant, month: month, due_date: due_date)
-    @payslip_data = generator.generate
+    payslip_data = generator.generate
+
     @payslip = Payslip.new(month: month, due_date: due_date)
+    # Build line items from generated data
+    payslip_data[:line_items].each do |line_item|
+      @payslip.payslip_line_items.build(name: line_item[:name], amount: line_item[:amount])
+    end
   end
 
   def create
     @payslip = @property_tenant.payslips.build(payslip_params)
 
-    if @payslip.save
-      # Create line items
-      items = line_items_params
-      items.each do |item_params|
-        @payslip.payslip_line_items.create!(item_params)
-      end
+    # Ensure month is beginning of month for uniqueness validation
+    if @payslip.month.present?
+      @payslip.month = @payslip.month.beginning_of_month
+    end
 
+    if @payslip.save
       redirect_to property_property_tenant_payslip_path(@property, @property_tenant, @payslip), notice: "Payslip was successfully created."
     else
-      # Regenerate payslip data for display
+      # If validation fails, rebuild line items from generator
       month = @payslip.month || Date.today.next_month.beginning_of_month
       due_date = @payslip.due_date || Date.new(month.year, month.month, 10)
       generator = PayslipGenerator.new(@property_tenant, month: month, due_date: due_date)
-      @payslip_data = generator.generate
+      payslip_data = generator.generate
+
+      # Rebuild line items if they were lost
+      if @payslip.payslip_line_items.empty?
+        payslip_data[:line_items].each do |line_item|
+          @payslip.payslip_line_items.build(name: line_item[:name], amount: line_item[:amount])
+        end
+      end
+
       render :new, status: :unprocessable_content
     end
-  rescue ActionController::ParameterMissing
-    # Handle missing line_items parameter
-    month = @payslip&.month || Date.today.next_month.beginning_of_month
-    due_date = @payslip&.due_date || Date.new(month.year, month.month, 10)
-    generator = PayslipGenerator.new(@property_tenant, month: month, due_date: due_date)
-    @payslip_data = generator.generate
-    @payslip ||= Payslip.new(month: month, due_date: due_date)
-    @payslip.errors.add(:base, "Line items are required")
-    render :new, status: :unprocessable_content
   end
 
   def show
@@ -65,17 +68,6 @@ class PayslipsController < ApplicationController
   end
 
   def payslip_params
-    params.require(:payslip).permit(:month, :due_date)
-  end
-
-  def line_items_params
-    return [] unless params[:line_items].present?
-    params[:line_items].map do |item|
-      if item.is_a?(ActionController::Parameters)
-        item.permit(:name, :amount)
-      else
-        ActionController::Parameters.new(item).permit(:name, :amount)
-      end
-    end.reject { |item| item[:name].blank? || item[:amount].blank? }
+    params.require(:payslip).permit(:month, :due_date, payslip_line_items_attributes: [:id, :name, :amount, :_destroy])
   end
 end

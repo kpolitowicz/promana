@@ -40,19 +40,19 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <% @payslip_data[:line_items].each_with_index do |line_item, index| %>
+            <%= form.fields_for :payslip_line_items do |line_item_form| %>
               <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= line_item[:name] %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= line_item_form.object.name %></td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <%= format_currency(line_item[:amount]) %>
-                  <%= hidden_field_tag "line_items[][name]", line_item[:name] %>
-                  <%= hidden_field_tag "line_items[][amount]", line_item[:amount] %>
+                  <%= format_currency(line_item_form.object.amount) %>
+                  <%= line_item_form.hidden_field :name %>
+                  <%= line_item_form.hidden_field :amount %>
                 </td>
               </tr>
             <% end %>
             <tr class="bg-gray-50 font-bold">
               <td class="px-6 py-4 whitespace-nowrap text-sm">Total</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm"><%= format_currency(@payslip_data[:line_items].sum { |item| item[:amount] }) %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm"><%= format_currency(@payslip.payslip_line_items.sum(&:amount)) %></td>
             </tr>
           </tbody>
         </table>

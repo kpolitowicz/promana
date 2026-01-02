@@ -42,18 +42,21 @@ RSpec.describe "Payslips", type: :request do
   describe "POST /properties/:property_id/property_tenants/:property_tenant_id/payslips" do
     let(:month) { (Date.today + 3.months).beginning_of_month } # Use a month far in the future to avoid conflicts
     let(:due_date) { Date.new(month.year, month.month, 10) }
-    let(:line_items) do
-      [
-        {name: "Rent", amount: "1000.00"},
-        {name: "Utilities", amount: "250.50"}
-      ]
+    let(:payslip_line_items_attributes) do
+      {
+        "0" => {name: "Rent", amount: "1000.00"},
+        "1" => {name: "Utilities", amount: "250.50"}
+      }
     end
 
     it "creates a new payslip with line items" do
       expect {
         post property_property_tenant_payslips_path(property, property_tenant), params: {
-          payslip: {month: month.to_s, due_date: due_date.to_s},
-          line_items: line_items
+          payslip: {
+            month: month.to_s,
+            due_date: due_date.to_s,
+            payslip_line_items_attributes: payslip_line_items_attributes
+          }
         }
       }.to change(Payslip, :count).by(1)
         .and change(PayslipLineItem, :count).by(2)
@@ -66,9 +69,16 @@ RSpec.describe "Payslips", type: :request do
     end
 
     it "redirects to the payslip show page" do
+      # Use a different month to avoid uniqueness conflict with previous test
+      different_month = (month + 1.month).beginning_of_month
+      different_due_date = Date.new(different_month.year, different_month.month, 10)
+
       post property_property_tenant_payslips_path(property, property_tenant), params: {
-        payslip: {month: month.to_s, due_date: due_date.to_s},
-        line_items: line_items
+        payslip: {
+          month: different_month.to_s,
+          due_date: different_due_date.to_s,
+          payslip_line_items_attributes: payslip_line_items_attributes
+        }
       }
       payslip = Payslip.last
       expect(payslip).not_to be_nil
@@ -78,8 +88,10 @@ RSpec.describe "Payslips", type: :request do
     it "does not create payslip if month is missing" do
       expect {
         post property_property_tenant_payslips_path(property, property_tenant), params: {
-          payslip: {due_date: due_date},
-          line_items: line_items
+          payslip: {
+            due_date: due_date.to_s,
+            payslip_line_items_attributes: payslip_line_items_attributes
+          }
         }
       }.not_to change(Payslip, :count)
     end
