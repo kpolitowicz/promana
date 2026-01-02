@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_02_011208) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_02_030356) do
   create_table "forecast_line_items", force: :cascade do |t|
     t.decimal "amount", precision: 10, scale: 2, null: false
     t.datetime "created_at", null: false
@@ -69,6 +69,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_02_011208) do
     t.index ["tenant_id"], name: "index_property_tenants_on_tenant_id"
   end
 
+  create_table "tenant_balance_sheets", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "due_date", null: false
+    t.date "month", null: false
+    t.decimal "owed", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "paid", precision: 10, scale: 2, default: "0.0", null: false
+    t.integer "property_id", null: false
+    t.integer "property_tenant_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["month"], name: "index_tenant_balance_sheets_on_month"
+    t.index ["property_id"], name: "index_tenant_balance_sheets_on_property_id"
+    t.index ["property_tenant_id", "month"], name: "index_tenant_balance_sheets_on_property_tenant_id_and_month", unique: true
+    t.index ["property_tenant_id"], name: "index_tenant_balance_sheets_on_property_tenant_id"
+  end
+
   create_table "tenant_payments", force: :cascade do |t|
     t.decimal "amount", precision: 10, scale: 2, null: false
     t.datetime "created_at", null: false
@@ -97,6 +112,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_02_011208) do
     t.integer "utility_provider_id", null: false
     t.index ["property_id"], name: "index_utility_payments_on_property_id"
     t.index ["utility_provider_id"], name: "index_utility_payments_on_utility_provider_id"
+  end
+
+  create_table "utility_provider_balance_sheets", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "due_date", null: false
+    t.date "month", null: false
+    t.decimal "owed", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "paid", precision: 10, scale: 2, default: "0.0", null: false
+    t.integer "property_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "utility_provider_id", null: false
+    t.index ["month"], name: "index_utility_provider_balance_sheets_on_month"
+    t.index ["property_id"], name: "index_utility_provider_balance_sheets_on_property_id"
+    t.index ["utility_provider_id", "month"], name: "idx_on_utility_provider_id_month_42722abb94", unique: true
+    t.index ["utility_provider_id"], name: "index_utility_provider_balance_sheets_on_utility_provider_id"
   end
 
   create_table "utility_provider_utility_types", force: :cascade do |t|
@@ -134,10 +164,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_02_011208) do
   add_foreign_key "payslips", "property_tenants"
   add_foreign_key "property_tenants", "properties"
   add_foreign_key "property_tenants", "tenants"
+  add_foreign_key "tenant_balance_sheets", "properties"
+  add_foreign_key "tenant_balance_sheets", "property_tenants"
   add_foreign_key "tenant_payments", "properties"
   add_foreign_key "tenant_payments", "property_tenants"
   add_foreign_key "utility_payments", "properties"
   add_foreign_key "utility_payments", "utility_providers"
+  add_foreign_key "utility_provider_balance_sheets", "properties"
+  add_foreign_key "utility_provider_balance_sheets", "utility_providers"
   add_foreign_key "utility_provider_utility_types", "utility_providers"
   add_foreign_key "utility_provider_utility_types", "utility_types"
   add_foreign_key "utility_providers", "properties"

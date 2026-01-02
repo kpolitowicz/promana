@@ -13,10 +13,20 @@ Rails.application.routes.draw do
     resources :property_tenants, only: [:new, :create, :destroy] do
       resources :payslips, only: [:index, :new, :create, :show, :destroy]
       resources :tenant_payments
+      resources :tenant_balance_sheets, only: [:index] do
+        collection do
+          patch :update_all
+        end
+      end
     end
     resources :utility_providers do
       resources :forecasts
       resources :utility_payments
+      resources :utility_provider_balance_sheets, only: [:index] do
+        collection do
+          patch :update_all
+        end
+      end
     end
   end
   resources :tenants

@@ -4,6 +4,7 @@ class UtilityProvider < ApplicationRecord
   has_many :utility_types, through: :utility_provider_utility_types
   has_many :forecasts, dependent: :destroy
   has_many :utility_payments, dependent: :destroy
+  has_many :utility_provider_balance_sheets, dependent: :destroy
 
   enum :forecast_behavior, {zero_after_expiry: "zero_after_expiry", carry_forward: "carry_forward"}
 
