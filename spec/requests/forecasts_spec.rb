@@ -253,9 +253,9 @@ RSpec.describe "Forecasts", type: :request do
       }.to change(ForecastLineItem, :count).by(-1)
     end
 
-    it "redirects to the utility provider forecasts index" do
+    it "redirects to the utility provider show page" do
       delete property_utility_provider_forecast_path(property, utility_provider, forecast)
-      expect(response).to redirect_to(property_utility_provider_forecasts_path(property, utility_provider))
+      expect(response).to redirect_to(property_utility_provider_path(property, utility_provider))
     end
   end
 end
