@@ -11,8 +11,8 @@ RSpec.describe "UtilityPayments", type: :request do
     end
 
     it "displays all utility payments" do
-      UtilityPayment.create!(utility_provider: utility_provider, property: property, month: Date.today.beginning_of_month, amount: 1000.00, paid_date: Date.today)
-      UtilityPayment.create!(utility_provider: utility_provider, property: property, month: (Date.today - 1.month).beginning_of_month, amount: 1200.00, paid_date: Date.today - 10.days)
+      UtilityPayment.create!(utility_provider: utility_provider, property: property, amount: 1000.00, paid_date: Date.today)
+      UtilityPayment.create!(utility_provider: utility_provider, property: property, amount: 1200.00, paid_date: Date.today - 10.days)
 
       get property_utility_provider_utility_payments_path(property, utility_provider)
       expect(response).to have_http_status(:success)
@@ -29,7 +29,6 @@ RSpec.describe "UtilityPayments", type: :request do
   end
 
   describe "POST /properties/:property_id/utility_providers/:utility_provider_id/utility_payments" do
-    let(:month) { (Date.today + 3.months).beginning_of_month }
     let(:paid_date) { Date.today }
     let(:amount) { 1000.00 }
 
@@ -37,7 +36,6 @@ RSpec.describe "UtilityPayments", type: :request do
       expect {
         post property_utility_provider_utility_payments_path(property, utility_provider), params: {
           utility_payment: {
-            month: month,
             amount: amount,
             paid_date: paid_date
           }
@@ -48,7 +46,6 @@ RSpec.describe "UtilityPayments", type: :request do
     it "redirects to the payment show page" do
       post property_utility_provider_utility_payments_path(property, utility_provider), params: {
         utility_payment: {
-          month: month,
           amount: amount,
           paid_date: paid_date
         }
@@ -60,7 +57,6 @@ RSpec.describe "UtilityPayments", type: :request do
     it "sets the property and utility_provider associations" do
       post property_utility_provider_utility_payments_path(property, utility_provider), params: {
         utility_payment: {
-          month: month,
           amount: amount,
           paid_date: paid_date
         }
@@ -71,12 +67,11 @@ RSpec.describe "UtilityPayments", type: :request do
     end
 
     context "with invalid parameters" do
-      it "does not create with empty month" do
+      it "does not create with empty amount" do
         expect {
           post property_utility_provider_utility_payments_path(property, utility_provider), params: {
             utility_payment: {
-              month: "",
-              amount: amount,
+              amount: "",
               paid_date: paid_date
             }
           }
@@ -86,8 +81,7 @@ RSpec.describe "UtilityPayments", type: :request do
       it "renders the new template with errors" do
         post property_utility_provider_utility_payments_path(property, utility_provider), params: {
           utility_payment: {
-            month: "",
-            amount: amount,
+            amount: "",
             paid_date: paid_date
           }
         }
@@ -101,7 +95,6 @@ RSpec.describe "UtilityPayments", type: :request do
       UtilityPayment.create!(
         utility_provider: utility_provider,
         property: property,
-        month: Date.today.beginning_of_month,
         amount: 1000.00,
         paid_date: Date.today
       )
@@ -115,7 +108,7 @@ RSpec.describe "UtilityPayments", type: :request do
     it "displays the payment details" do
       get property_utility_provider_utility_payment_path(property, utility_provider, payment)
       expect(response.body).to include("1000.00")
-      expect(response.body).to include(payment.month.strftime("%B %Y"))
+      expect(response.body).to include(payment.paid_date.strftime("%B %d, %Y"))
     end
   end
 
@@ -124,7 +117,6 @@ RSpec.describe "UtilityPayments", type: :request do
       UtilityPayment.create!(
         utility_provider: utility_provider,
         property: property,
-        month: Date.today.beginning_of_month,
         amount: 1000.00,
         paid_date: Date.today
       )
@@ -141,7 +133,6 @@ RSpec.describe "UtilityPayments", type: :request do
       UtilityPayment.create!(
         utility_provider: utility_provider,
         property: property,
-        month: Date.today.beginning_of_month,
         amount: 1000.00,
         paid_date: Date.today
       )
@@ -194,7 +185,6 @@ RSpec.describe "UtilityPayments", type: :request do
       UtilityPayment.create!(
         utility_provider: utility_provider,
         property: property,
-        month: Date.today.beginning_of_month,
         amount: 1000.00,
         paid_date: Date.today
       )

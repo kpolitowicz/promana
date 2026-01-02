@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_02_010736) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_02_011208) do
   create_table "forecast_line_items", force: :cascade do |t|
     t.decimal "amount", precision: 10, scale: 2, null: false
     t.datetime "created_at", null: false
@@ -72,13 +72,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_02_010736) do
   create_table "tenant_payments", force: :cascade do |t|
     t.decimal "amount", precision: 10, scale: 2, null: false
     t.datetime "created_at", null: false
-    t.date "month", null: false
     t.date "paid_date", null: false
     t.integer "property_id", null: false
     t.integer "property_tenant_id", null: false
     t.datetime "updated_at", null: false
     t.index ["property_id"], name: "index_tenant_payments_on_property_id"
-    t.index ["property_tenant_id", "month"], name: "index_tenant_payments_on_property_tenant_id_and_month", unique: true
     t.index ["property_tenant_id"], name: "index_tenant_payments_on_property_tenant_id"
   end
 
@@ -93,13 +91,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_02_010736) do
   create_table "utility_payments", force: :cascade do |t|
     t.decimal "amount", precision: 10, scale: 2, null: false
     t.datetime "created_at", null: false
-    t.date "month", null: false
     t.date "paid_date", null: false
     t.integer "property_id", null: false
     t.datetime "updated_at", null: false
     t.integer "utility_provider_id", null: false
     t.index ["property_id"], name: "index_utility_payments_on_property_id"
-    t.index ["utility_provider_id", "month"], name: "index_utility_payments_on_utility_provider_id_and_month", unique: true
     t.index ["utility_provider_id"], name: "index_utility_payments_on_utility_provider_id"
   end
 

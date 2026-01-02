@@ -20,40 +20,27 @@ RSpec.describe TenantPayment, type: :model do
   end
 
   describe "validations" do
-    it "is valid with month, amount, and paid_date" do
-      payment = TenantPayment.new(property_tenant: property_tenant, property: property, month: Date.today, amount: 1000.00, paid_date: Date.today)
+    it "is valid with amount and paid_date" do
+      payment = TenantPayment.new(property_tenant: property_tenant, property: property, amount: 1000.00, paid_date: Date.today)
       expect(payment).to be_valid
     end
 
-    it "requires month" do
-      payment = TenantPayment.new(property_tenant: property_tenant, property: property, amount: 1000.00, paid_date: Date.today)
-      expect(payment).not_to be_valid
-      expect(payment.errors[:month]).to include("can't be blank")
-    end
-
     it "requires amount" do
-      payment = TenantPayment.new(property_tenant: property_tenant, property: property, month: Date.today, paid_date: Date.today)
+      payment = TenantPayment.new(property_tenant: property_tenant, property: property, paid_date: Date.today)
       expect(payment).not_to be_valid
       expect(payment.errors[:amount]).to include("can't be blank")
     end
 
     it "requires paid_date" do
-      payment = TenantPayment.new(property_tenant: property_tenant, property: property, month: Date.today, amount: 1000.00)
+      payment = TenantPayment.new(property_tenant: property_tenant, property: property, amount: 1000.00)
       expect(payment).not_to be_valid
       expect(payment.errors[:paid_date]).to include("can't be blank")
-    end
-
-    it "requires unique property_tenant and month combination" do
-      TenantPayment.create!(property_tenant: property_tenant, property: property, month: Date.today.beginning_of_month, amount: 1000.00, paid_date: Date.today)
-      duplicate = TenantPayment.new(property_tenant: property_tenant, property: property, month: Date.today.beginning_of_month, amount: 2000.00, paid_date: Date.today)
-      expect(duplicate).not_to be_valid
-      expect(duplicate.errors[:property_id]).to include("has already been taken")
     end
   end
 
   describe "#tenant" do
     it "returns the tenant through property_tenant" do
-      payment = TenantPayment.create!(property_tenant: property_tenant, property: property, month: Date.today, amount: 1000.00, paid_date: Date.today)
+      payment = TenantPayment.create!(property_tenant: property_tenant, property: property, amount: 1000.00, paid_date: Date.today)
       expect(payment.tenant).to eq(tenant)
     end
   end

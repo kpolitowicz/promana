@@ -4,14 +4,14 @@ class TenantPaymentsController < ApplicationController
   before_action :set_tenant_payment, only: [:show, :edit, :update, :destroy]
 
   def index
-    @tenant_payments = @property_tenant.tenant_payments.order(month: :desc, paid_date: :desc)
+    @tenant_payments = @property_tenant.tenant_payments.order(paid_date: :desc)
   end
 
   def show
   end
 
   def new
-    @tenant_payment = TenantPayment.new(property_tenant: @property_tenant, property: @property, month: Date.today.next_month.beginning_of_month, paid_date: Date.today)
+    @tenant_payment = TenantPayment.new(property_tenant: @property_tenant, property: @property, paid_date: Date.today)
   end
 
   def create
@@ -57,6 +57,6 @@ class TenantPaymentsController < ApplicationController
   end
 
   def tenant_payment_params
-    params.require(:tenant_payment).permit(:month, :amount, :paid_date)
+    params.require(:tenant_payment).permit(:amount, :paid_date)
   end
 end

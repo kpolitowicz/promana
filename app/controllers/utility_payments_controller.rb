@@ -4,14 +4,14 @@ class UtilityPaymentsController < ApplicationController
   before_action :set_utility_payment, only: [:show, :edit, :update, :destroy]
 
   def index
-    @utility_payments = @utility_provider.utility_payments.order(month: :desc, paid_date: :desc)
+    @utility_payments = @utility_provider.utility_payments.order(paid_date: :desc)
   end
 
   def show
   end
 
   def new
-    @utility_payment = UtilityPayment.new(utility_provider: @utility_provider, property: @property, month: Date.today.next_month.beginning_of_month, paid_date: Date.today)
+    @utility_payment = UtilityPayment.new(utility_provider: @utility_provider, property: @property, paid_date: Date.today)
   end
 
   def create
@@ -57,6 +57,6 @@ class UtilityPaymentsController < ApplicationController
   end
 
   def utility_payment_params
-    params.require(:utility_payment).permit(:month, :amount, :paid_date)
+    params.require(:utility_payment).permit(:amount, :paid_date)
   end
 end
