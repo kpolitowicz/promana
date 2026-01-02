@@ -72,4 +72,22 @@ RSpec.describe Payslip, type: :model do
       expect(payslip.tenant).to eq(tenant)
     end
   end
+
+  describe ".name_header" do
+    it "returns the name header label" do
+      expect(Payslip.name_header).to eq("Pozycja")
+    end
+  end
+
+  describe ".amount_header" do
+    it "returns the amount header label" do
+      expect(Payslip.amount_header).to eq("Kwota")
+    end
+  end
+
+  describe ".total_header" do
+    it "returns the total header label" do
+      expect(Payslip.total_header).to eq("Razem")
+    end
+  end
 end
