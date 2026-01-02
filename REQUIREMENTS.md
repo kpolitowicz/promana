@@ -197,7 +197,11 @@ Vendor Payments
   - Utility Providers (with forecast behavior and utility type associations, nested under properties)
   - Property-Tenant Assignments (with rent amounts, nested under properties)
   - Forecasts (with itemized line items)
-- **Payslip Management**: View and generate payslips through web interface
+- **Payslip Management**: View, generate, save, and delete payslips through web interface
+  - Generate payslips with automatic calculation of utilities based on forecasts
+  - Override month and due date during generation
+  - Automatic regeneration of line items when month/due date changes
+  - View payslips in tabular format with line items and totals
 - **Navigation**: Easy navigation between all major sections
 - **Data Management**: Ability to delete entities with confirmation dialogs
 - **Form Validation**: Client and server-side validation with error messages
