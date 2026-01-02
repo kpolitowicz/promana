@@ -260,8 +260,13 @@ Utility Provider Entity
 - **Ruby Version**: 4.0.0
 - **Database**: SQLite3 (development/test), with support for production database configuration
 - **Styling**: Tailwind CSS for responsive, modern UI
-- **Testing**: RSpec for comprehensive test coverage
+- **Testing**: RSpec for comprehensive test coverage (226 examples, 0 failures)
 - **Code Quality**: StandardRB for Ruby code style enforcement
+- **Production Deployment**: `bin/prod` script for production server startup
+  - Automatically runs database migrations
+  - Precompiles assets (Propshaft)
+  - Starts Rails server in production mode
+  - Supports PORT, SKIP_MIGRATE, and SKIP_ASSETS environment variables
 - **Architecture**: Service objects for complex business logic (ForecastCalculator, PayslipGenerator)
 - **Currency Configuration**: Configurable currency symbol and position (before/after amount) via environment variables:
   - `CURRENCY_SYMBOL`: Currency symbol (default: "zł" for PLN)
