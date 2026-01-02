@@ -1,7 +1,9 @@
 require "rails_helper"
 
 RSpec.describe UtilityProvider, type: :model do
-  let(:property) { Property.create!(name: "Test Property") }
+  fixtures :properties, :utility_providers
+
+  let(:property) { properties(:property_one) }
 
   describe "associations" do
     it "belongs to property" do
@@ -42,16 +44,17 @@ RSpec.describe UtilityProvider, type: :model do
     end
 
     it "validates uniqueness of name scoped to property_id" do
-      UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property)
-      duplicate = UtilityProvider.new(name: "Test Provider", forecast_behavior: "carry_forward", property: property)
+      # Fixture already creates utility_provider_one with name "Test Provider 1" for property_one
+      # Try to create duplicate with same name
+      duplicate = UtilityProvider.new(name: "Test Provider 1", forecast_behavior: "carry_forward", property: property)
       expect(duplicate).not_to be_valid
       expect(duplicate.errors[:name]).to be_present
     end
 
     it "allows same name for different properties" do
-      property2 = Property.create!(name: "Test Property 2")
-      UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property)
-      duplicate = UtilityProvider.new(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property2)
+      property2 = properties(:property_two)
+      # Use a unique name that doesn't conflict with fixtures
+      duplicate = UtilityProvider.new(name: "Unique Provider Name", forecast_behavior: "zero_after_expiry", property: property2)
       expect(duplicate).to be_valid
     end
   end

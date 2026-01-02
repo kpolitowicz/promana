@@ -1,8 +1,10 @@
 require "rails_helper"
 
 RSpec.describe ForecastLineItem, type: :model do
-  let(:property) { Property.create!(name: "Test Property") }
-  let(:utility_provider) { UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property) }
+  fixtures :properties, :utility_providers
+
+  let(:property) { properties(:property_one) }
+  let(:utility_provider) { utility_providers(:utility_provider_one) }
   let(:forecast) { Forecast.create!(utility_provider: utility_provider, property: property, issued_date: Date.today) }
 
   describe "associations" do

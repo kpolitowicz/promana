@@ -1,8 +1,10 @@
 require "rails_helper"
 
 RSpec.describe UtilityPayment, type: :model do
-  let(:property) { Property.create!(name: "Test Property") }
-  let(:utility_provider) { UtilityProvider.create!(property: property, name: "Test Provider", forecast_behavior: "zero_after_expiry") }
+  fixtures :properties, :utility_providers
+
+  let(:property) { properties(:property_one) }
+  let(:utility_provider) { utility_providers(:utility_provider_one) }
 
   describe "associations" do
     it "belongs to utility_provider" do

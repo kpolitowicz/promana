@@ -1,9 +1,11 @@
 require "rails_helper"
 
 RSpec.describe Payslip, type: :model do
-  let(:property) { Property.create!(name: "Test Property") }
-  let(:tenant) { Tenant.create!(name: "Test Tenant") }
-  let(:property_tenant) { PropertyTenant.create!(property: property, tenant: tenant, rent_amount: 1000.00) }
+  fixtures :properties, :tenants, :property_tenants
+
+  let(:property) { properties(:property_one) }
+  let(:tenant) { tenants(:tenant_one) }
+  let(:property_tenant) { property_tenants(:property_tenant_one) }
 
   describe "associations" do
     it "belongs to property" do

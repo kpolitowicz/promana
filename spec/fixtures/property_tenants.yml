@@ -1,0 +1,11 @@
+# Property-Tenant assignments fixtures
+property_tenant_one:
+  property: property_one
+  tenant: tenant_one
+  rent_amount: 1000.00
+
+property_tenant_two:
+  property: property_two
+  tenant: tenant_two
+  rent_amount: 2000.00
+

@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe UtilityType, type: :model do
+  fixtures :utility_types
   describe "associations" do
     it "has many utility_provider_utility_types" do
       utility_type = UtilityType.reflect_on_association(:utility_provider_utility_types)
@@ -17,7 +18,7 @@ RSpec.describe UtilityType, type: :model do
 
   describe "validations" do
     it "is valid with a name" do
-      utility_type = UtilityType.new(name: "Heating")
+      utility_type = UtilityType.new(name: "Unique Utility Type")
       expect(utility_type).to be_valid
     end
 
@@ -28,7 +29,7 @@ RSpec.describe UtilityType, type: :model do
     end
 
     it "requires unique name" do
-      UtilityType.create!(name: "Heating")
+      # Fixture already creates utility_type_heating with name "Heating"
       duplicate = UtilityType.new(name: "Heating")
       expect(duplicate).not_to be_valid
       expect(duplicate.errors[:name]).to include("has already been taken")

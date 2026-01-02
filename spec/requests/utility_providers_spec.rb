@@ -1,9 +1,11 @@
 require "rails_helper"
 
 RSpec.describe "UtilityProviders", type: :request do
-  let(:property) { Property.create!(name: "Test Property") }
-  let(:utility_type1) { UtilityType.create!(name: "Heating") }
-  let(:utility_type2) { UtilityType.create!(name: "Water") }
+  fixtures :properties, :utility_types
+
+  let(:property) { properties(:property_one) }
+  let(:utility_type1) { utility_types(:utility_type_heating) }
+  let(:utility_type2) { utility_types(:utility_type_water) }
 
   describe "GET /properties/:property_id/utility_providers/new" do
     it "renders the new template" do

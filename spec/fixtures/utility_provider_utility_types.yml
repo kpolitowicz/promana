@@ -1,0 +1,9 @@
+# Utility Provider - Utility Type associations fixtures
+utility_provider_one_energia:
+  utility_provider: utility_provider_one
+  utility_type: utility_type_energia
+
+utility_provider_two_zarzadca:
+  utility_provider: utility_provider_two
+  utility_type: utility_type_zarzadca
+

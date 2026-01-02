@@ -1,0 +1,9 @@
+# Tenants fixtures
+tenant_one:
+  name: "Test Tenant 1"
+  email: "tenant1@example.com"
+
+tenant_two:
+  name: "Test Tenant 2"
+  email: "tenant2@example.com"
+

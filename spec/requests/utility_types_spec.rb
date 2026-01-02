@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "UtilityTypes", type: :request do
+  fixtures :utility_types
   describe "GET /utility_types" do
     it "renders the index template" do
       get utility_types_path
@@ -8,11 +9,10 @@ RSpec.describe "UtilityTypes", type: :request do
     end
 
     it "displays all utility types" do
-      UtilityType.create!(name: "Heating")
-      UtilityType.create!(name: "Water")
+      # Fixtures already create utility types
       get utility_types_path
-      expect(response.body).to include("Heating")
-      expect(response.body).to include("Water")
+      expect(response.body).to include("Energia")
+      expect(response.body).to include("Zarządca")
     end
   end
 
@@ -27,12 +27,12 @@ RSpec.describe "UtilityTypes", type: :request do
     context "with valid parameters" do
       it "creates a new utility type" do
         expect {
-          post utility_types_path, params: {utility_type: {name: "Heating"}}
+          post utility_types_path, params: {utility_type: {name: "Unique Utility Type"}}
         }.to change(UtilityType, :count).by(1)
       end
 
       it "redirects to the utility types index" do
-        post utility_types_path, params: {utility_type: {name: "Heating"}}
+        post utility_types_path, params: {utility_type: {name: "Another Unique Type"}}
         expect(response).to redirect_to(utility_types_path)
       end
     end
@@ -50,16 +50,16 @@ RSpec.describe "UtilityTypes", type: :request do
       end
 
       it "does not create duplicate utility types" do
-        UtilityType.create!(name: "Heating")
+        # Fixture already creates utility_type_energia with name "Energia"
         expect {
-          post utility_types_path, params: {utility_type: {name: "Heating"}}
+          post utility_types_path, params: {utility_type: {name: "Energia"}}
         }.not_to change(UtilityType, :count)
       end
     end
   end
 
   describe "DELETE /utility_types/:id" do
-    let!(:utility_type) { UtilityType.create!(name: "Heating") }
+    let(:utility_type) { utility_types(:utility_type_energia) }
 
     it "destroys the utility type" do
       expect {

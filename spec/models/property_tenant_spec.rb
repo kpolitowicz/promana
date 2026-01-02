@@ -16,8 +16,10 @@ RSpec.describe PropertyTenant, type: :model do
   end
 
   describe "validations" do
-    let(:property) { Property.create!(name: "Test Property") }
-    let(:tenant) { Tenant.create!(name: "Test Tenant") }
+    fixtures :properties, :tenants, :property_tenants
+
+    let(:property) { properties(:property_one) }
+    let(:tenant) { tenants(:tenant_one) }
 
     it "requires rent_amount" do
       property_tenant = PropertyTenant.new(property: property, tenant: tenant)
@@ -38,22 +40,23 @@ RSpec.describe PropertyTenant, type: :model do
     end
 
     it "validates uniqueness of property_id scoped to tenant_id" do
-      PropertyTenant.create!(property: property, tenant: tenant, rent_amount: 1000)
+      # Fixture already creates property_tenant_one with property_one and tenant_one
+      # Try to create duplicate
       duplicate = PropertyTenant.new(property: property, tenant: tenant, rent_amount: 2000)
       expect(duplicate).not_to be_valid
       expect(duplicate.errors[:property_id]).to be_present
     end
 
     it "allows same tenant for different properties" do
-      property2 = Property.create!(name: "Test Property 2")
-      PropertyTenant.create!(property: property, tenant: tenant, rent_amount: 1000)
+      property2 = properties(:property_two)
+      # Fixture already creates property_tenant_one with property_one and tenant_one
       duplicate = PropertyTenant.new(property: property2, tenant: tenant, rent_amount: 2000)
       expect(duplicate).to be_valid
     end
 
     it "allows same property for different tenants" do
-      tenant2 = Tenant.create!(name: "Test Tenant 2")
-      PropertyTenant.create!(property: property, tenant: tenant, rent_amount: 1000)
+      tenant2 = tenants(:tenant_two)
+      # Fixture already creates property_tenant_one with property_one and tenant_one
       duplicate = PropertyTenant.new(property: property, tenant: tenant2, rent_amount: 2000)
       expect(duplicate).to be_valid
     end

@@ -1,0 +1,7 @@
+# Properties fixtures
+property_one:
+  name: "Test Property 1"
+
+property_two:
+  name: "Test Property 2"
+

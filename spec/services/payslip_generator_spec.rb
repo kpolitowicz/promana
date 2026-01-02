@@ -1,9 +1,11 @@
 require "rails_helper"
 
 RSpec.describe PayslipGenerator do
-  let(:property) { Property.create!(name: "Test Property") }
-  let(:tenant) { Tenant.create!(name: "Test Tenant") }
-  let(:property_tenant) { PropertyTenant.create!(property: property, tenant: tenant, rent_amount: 1000.00) }
+  fixtures :properties, :tenants, :property_tenants
+
+  let(:property) { properties(:property_one) }
+  let(:tenant) { tenants(:tenant_one) }
+  let(:property_tenant) { property_tenants(:property_tenant_one) }
   let(:target_month) { Date.today.next_month.beginning_of_month }
 
   describe "#generate" do
@@ -51,7 +53,9 @@ RSpec.describe PayslipGenerator do
     end
 
     context "with zero_after_expiry behavior and no active forecast" do
-      let(:utility_provider) { UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property) }
+      fixtures :utility_providers
+
+      let(:utility_provider) { utility_providers(:utility_provider_one) }
 
       it "excludes utility from payslip" do
         generator = PayslipGenerator.new(property_tenant, month: target_month)
@@ -63,10 +67,14 @@ RSpec.describe PayslipGenerator do
     end
 
     context "with carry_forward behavior and no active forecast" do
-      let(:utility_provider) { UtilityProvider.create!(name: "Test Provider", forecast_behavior: "carry_forward", property: property) }
+      fixtures :utility_providers
+
+      let(:utility_provider) { utility_providers(:utility_provider_two) }
       let(:old_forecast) { Forecast.create!(utility_provider: utility_provider, property: property, issued_date: Date.today - 2.months) }
 
       it "carries forward line items from last forecast" do
+        # Update provider name to match expected format
+        utility_provider.update!(name: "Test Provider")
         ForecastLineItem.create!(forecast: old_forecast, name: "Forecast", amount: 300.00, due_date: Date.today.beginning_of_month - 5.days)
 
         generator = PayslipGenerator.new(property_tenant, month: target_month)

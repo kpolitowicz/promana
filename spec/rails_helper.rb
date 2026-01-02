@@ -45,6 +45,9 @@ RSpec.configure do |config|
   # instead of true.
   config.use_transactional_fixtures = true
 
+  # Note: Fixtures are automatically reloaded before each test when using transactional fixtures.
+  # Individual spec files should declare which fixtures they need using: fixtures :properties, :tenants
+
   # You can uncomment this line to turn off ActiveRecord support entirely.
   # config.use_active_record = false
 

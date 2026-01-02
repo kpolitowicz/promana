@@ -1,0 +1,13 @@
+# Utility Types fixtures
+utility_type_energia:
+  name: "Energia"
+
+utility_type_zarzadca:
+  name: "Zarządca"
+
+utility_type_heating:
+  name: "Heating"
+
+utility_type_water:
+  name: "Water"
+
