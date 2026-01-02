@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_02_010016) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_02_010736) do
   create_table "forecast_line_items", force: :cascade do |t|
     t.decimal "amount", precision: 10, scale: 2, null: false
     t.datetime "created_at", null: false
@@ -90,6 +90,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_02_010016) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "utility_payments", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.date "month", null: false
+    t.date "paid_date", null: false
+    t.integer "property_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "utility_provider_id", null: false
+    t.index ["property_id"], name: "index_utility_payments_on_property_id"
+    t.index ["utility_provider_id", "month"], name: "index_utility_payments_on_utility_provider_id_and_month", unique: true
+    t.index ["utility_provider_id"], name: "index_utility_payments_on_utility_provider_id"
+  end
+
   create_table "utility_provider_utility_types", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -127,6 +140,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_02_010016) do
   add_foreign_key "property_tenants", "tenants"
   add_foreign_key "tenant_payments", "properties"
   add_foreign_key "tenant_payments", "property_tenants"
+  add_foreign_key "utility_payments", "properties"
+  add_foreign_key "utility_payments", "utility_providers"
   add_foreign_key "utility_provider_utility_types", "utility_providers"
   add_foreign_key "utility_provider_utility_types", "utility_types"
   add_foreign_key "utility_providers", "properties"
