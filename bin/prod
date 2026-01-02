@@ -1,0 +1,47 @@
+#!/usr/bin/env sh
+
+# Production server startup script
+# This script prepares and starts the Rails server in production mode
+#
+# Usage:
+#   bin/prod                    # Start server on port 3000
+#   PORT=8080 bin/prod          # Start server on custom port
+#   SKIP_MIGRATE=1 bin/prod     # Skip database migrations
+#   SKIP_ASSETS=1 bin/prod      # Skip asset precompilation
+
+set -e
+
+# Default to port 3000 if not specified
+export PORT="${PORT:-3000}"
+export RAILS_ENV=production
+
+echo "Starting Rails server in production mode..."
+echo "Port: $PORT"
+echo "RAILS_ENV: $RAILS_ENV"
+echo ""
+
+# Run database migrations if not skipped
+if [ -z "$SKIP_MIGRATE" ]; then
+  echo "Running database migrations..."
+  bin/rails db:migrate
+  echo ""
+else
+  echo "Skipping database migrations (SKIP_MIGRATE=1)"
+  echo ""
+fi
+
+# Precompile assets if not skipped
+if [ -z "$SKIP_ASSETS" ]; then
+  echo "Precompiling assets..."
+  bin/rails assets:precompile
+  echo ""
+else
+  echo "Skipping asset precompilation (SKIP_ASSETS=1)"
+  echo ""
+fi
+
+# Start the server
+echo "Starting Rails server on port $PORT..."
+echo ""
+exec bin/rails server -p "$PORT"
+
