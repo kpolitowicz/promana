@@ -42,10 +42,9 @@ RSpec.describe ForecastLineItem, type: :model do
       expect(line_item.errors[:due_date]).to include("can't be blank")
     end
 
-    it "requires amount to be greater than or equal to 0" do
-      line_item = ForecastLineItem.new(forecast: forecast, name: "Forecast", amount: -10, due_date: Date.today)
-      expect(line_item).not_to be_valid
-      expect(line_item.errors[:amount]).to be_present
+    it "allows negative amounts (for differences/refunds)" do
+      line_item = ForecastLineItem.new(forecast: forecast, name: "Rozliczenie", amount: -20.50, due_date: Date.today)
+      expect(line_item).to be_valid
     end
 
     it "allows amount to be 0" do
