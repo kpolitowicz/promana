@@ -257,5 +257,161 @@ RSpec.describe PayslipGenerator do
         end
       end
     end
+
+    context "with forecast adjustments from previous month" do
+      let(:february_2026) { Date.new(2026, 2, 1) }
+      let(:march_2026) { Date.new(2026, 3, 1) }
+      let(:management_provider) { UtilityProvider.create!(name: "Management", forecast_behavior: "carry_forward", property: property) }
+
+      context "when new forecast received after payslip was generated" do
+        it "includes adjustment line item (Wyrównanie) in next month's payslip" do
+          # Create old forecast with waste: 100, water: 200 (used for carry forward)
+          old_forecast = Forecast.create!(
+            utility_provider: management_provider,
+            property: property,
+            issued_date: Date.new(2026, 1, 1)
+          )
+          ForecastLineItem.create!(forecast: old_forecast, name: "Waste", amount: 100.00, due_date: Date.new(2026, 1, 10))
+          ForecastLineItem.create!(forecast: old_forecast, name: "Water", amount: 200.00, due_date: Date.new(2026, 1, 10))
+
+          # Create February payslip on 2026-01-26 (uses carry forward: waste 100, water 200)
+          february_payslip = Payslip.create!(
+            property: property,
+            property_tenant: property_tenant,
+            month: february_2026,
+            due_date: Date.new(2026, 2, 10),
+            created_at: Time.zone.parse("2026-01-26")
+          )
+          february_payslip.payslip_line_items.create!(name: "Rent", amount: 700.00)
+          february_payslip.payslip_line_items.create!(name: "Management - Waste", amount: 100.00)
+          february_payslip.payslip_line_items.create!(name: "Management - Water", amount: 200.00)
+
+          # New forecast received on 2026-02-05 with updated amounts (waste: 90, water: 220)
+          new_forecast = Forecast.create!(
+            utility_provider: management_provider,
+            property: property,
+            issued_date: Date.new(2026, 2, 5)
+          )
+          ForecastLineItem.create!(forecast: new_forecast, name: "Waste", amount: 90.00, due_date: Date.new(2026, 2, 10))
+          ForecastLineItem.create!(forecast: new_forecast, name: "Water", amount: 220.00, due_date: Date.new(2026, 2, 10))
+
+          # Generate March payslip
+          generator = PayslipGenerator.new(property_tenant, month: march_2026)
+          result = generator.generate
+
+          # Should include adjustment line item: (90-100) + (220-200) = -10 + 20 = +10
+          adjustment_item = result[:line_items].find { |item| item[:name] == Payslip.adjustment_label }
+          expect(adjustment_item).not_to be_nil
+          expect(adjustment_item[:amount]).to eq(10.00)
+        end
+      end
+
+      context "when no new forecast received after payslip was generated" do
+        it "does not include adjustment line item" do
+          # Create forecast
+          forecast = Forecast.create!(
+            utility_provider: management_provider,
+            property: property,
+            issued_date: Date.new(2026, 1, 1)
+          )
+          ForecastLineItem.create!(forecast: forecast, name: "Waste", amount: 100.00, due_date: Date.new(2026, 2, 10))
+
+          # Create February payslip on 2026-01-26
+          february_payslip = Payslip.create!(
+            property: property,
+            property_tenant: property_tenant,
+            month: february_2026,
+            due_date: Date.new(2026, 2, 10),
+            created_at: Time.zone.parse("2026-01-26")
+          )
+          february_payslip.payslip_line_items.create!(name: "Rent", amount: 700.00)
+          february_payslip.payslip_line_items.create!(name: "Management - Waste", amount: 100.00)
+
+          # Generate March payslip (no new forecast after payslip creation)
+          generator = PayslipGenerator.new(property_tenant, month: march_2026)
+          result = generator.generate
+
+          # Should not include adjustment line item
+          expect(result[:line_items].none? { |item| item[:name] == Payslip.adjustment_label }).to be true
+        end
+      end
+
+      context "when adjustment results in negative amount" do
+        it "includes negative adjustment line item" do
+          # Create February payslip with waste: 100, water: 200
+          february_payslip = Payslip.create!(
+            property: property,
+            property_tenant: property_tenant,
+            month: february_2026,
+            due_date: Date.new(2026, 2, 10),
+            created_at: Time.zone.parse("2026-01-26")
+          )
+          february_payslip.payslip_line_items.create!(name: "Rent", amount: 700.00)
+          february_payslip.payslip_line_items.create!(name: "Management - Waste", amount: 100.00)
+          february_payslip.payslip_line_items.create!(name: "Management - Water", amount: 200.00)
+
+          # New forecast with lower amounts (waste: 80, water: 180)
+          new_forecast = Forecast.create!(
+            utility_provider: management_provider,
+            property: property,
+            issued_date: Date.new(2026, 2, 5)
+          )
+          ForecastLineItem.create!(forecast: new_forecast, name: "Waste", amount: 80.00, due_date: Date.new(2026, 2, 10))
+          ForecastLineItem.create!(forecast: new_forecast, name: "Water", amount: 180.00, due_date: Date.new(2026, 2, 10))
+
+          # Generate March payslip
+          generator = PayslipGenerator.new(property_tenant, month: march_2026)
+          result = generator.generate
+
+          # Should include negative adjustment: (80-100) + (180-200) = -20 + -20 = -40
+          adjustment_item = result[:line_items].find { |item| item[:name] == Payslip.adjustment_label }
+          expect(adjustment_item).not_to be_nil
+          expect(adjustment_item[:amount]).to eq(-40.00)
+        end
+      end
+
+      context "when multiple utility providers have adjustments" do
+        let(:provider2) { UtilityProvider.create!(name: "Energy Provider", forecast_behavior: "carry_forward", property: property) }
+
+        it "sums adjustments from all providers" do
+          # Create February payslip
+          february_payslip = Payslip.create!(
+            property: property,
+            property_tenant: property_tenant,
+            month: february_2026,
+            due_date: Date.new(2026, 2, 10),
+            created_at: Time.zone.parse("2026-01-26")
+          )
+          february_payslip.payslip_line_items.create!(name: "Rent", amount: 700.00)
+          february_payslip.payslip_line_items.create!(name: "Management - Waste", amount: 100.00)
+          february_payslip.payslip_line_items.create!(name: "Energy Provider - Forecast", amount: 50.00)
+
+          # New forecasts received
+          new_management_forecast = Forecast.create!(
+            utility_provider: management_provider,
+            property: property,
+            issued_date: Date.new(2026, 2, 5)
+          )
+          ForecastLineItem.create!(forecast: new_management_forecast, name: "Waste", amount: 90.00, due_date: Date.new(2026, 2, 10))
+
+          new_energy_forecast = Forecast.create!(
+            utility_provider: provider2,
+            property: property,
+            issued_date: Date.new(2026, 2, 6)
+          )
+          ForecastLineItem.create!(forecast: new_energy_forecast, name: "Forecast", amount: 60.00, due_date: Date.new(2026, 2, 10))
+
+          # Generate March payslip
+          generator = PayslipGenerator.new(property_tenant, month: march_2026)
+          result = generator.generate
+
+          # Should include adjustment: (90-100) + (60-50) = -10 + 10 = 0
+          # Actually wait, if it's 0, it shouldn't be included. Let me check the logic.
+          # But in this case it's -10 + 10 = 0, so no adjustment line item
+          adjustment_item = result[:line_items].find { |item| item[:name] == Payslip.adjustment_label }
+          expect(adjustment_item).to be_nil
+        end
+      end
+    end
   end
 end

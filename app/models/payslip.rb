@@ -38,4 +38,9 @@ class Payslip < ApplicationRecord
   def self.overpayment_label
     "Nadpłata"
   end
+
+  # Configurable label for forecast adjustments
+  def self.adjustment_label
+    "Wyrównanie"
+  end
 end

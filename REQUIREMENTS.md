@@ -93,12 +93,19 @@ This application is designed to manage rental properties, tenants, and associate
     - Payment differences are calculated by comparing the previous month's payslip total with all payments made in that month (based on paid_date)
     - Multiple payments in the same month are summed together
     - No difference line item is added if payments exactly match the payslip total
+  - **Forecast Adjustments from Previous Month**: Automatically calculated and included as line items when new forecasts are received after a payslip was generated:
+    - **Adjustment (Wyrównanie)**: When a new forecast is received for a month after the payslip was already generated, the difference between the payslip amounts and the new forecast amounts is calculated
+    - The adjustment compares what was included in the previous month's payslip (per utility provider and line item) with the most recent forecast for that month
+    - Adjustments are calculated per utility provider and summed across all providers
+    - Positive adjustments indicate the tenant was undercharged (needs to pay more)
+    - Negative adjustments indicate the tenant was overcharged (credit/refund)
+    - No adjustment line item is added if the total difference is zero
 - Utility amounts are determined by:
   - Active forecasts for the target month (if available)
   - Forecast behavior rules when no forecast exists (zero after expiry or carry forward)
 - Payslips are viewable as HTML/web pages in tabular format with line items and total
 - Payslips can be generated, saved, and deleted through web interface
-- **Configurable Labels**: Payment difference labels (Arrears, Credit) are configurable in the Payslip model
+- **Configurable Labels**: Payment difference labels (Arrears, Credit) and forecast adjustment label (Wyrównanie) are configurable in the Payslip model
 
 ### 3. Utility Update Workflow
 
@@ -170,12 +177,13 @@ This application is designed to manage rental properties, tenants, and associate
 4. **Single-User Application**: No authentication or multi-user support required
 
 5. **Payment Adjustments**: When payments arrive after payslip generation, the difference is automatically calculated and included in the next month's payslip as a line item (Arrears for underpayment, Credit for overpayment)
+6. **Forecast Adjustments**: When new forecasts are received for a month after the payslip was already generated, the difference between the payslip amounts and the new forecast amounts is automatically calculated and included in the next month's payslip as an adjustment line item (Wyrównanie)
 
-6. **Forecast Impact**: Payment forecasts affect tenant payslip calculations for the months they cover
+7. **Forecast Impact**: Payment forecasts affect tenant payslip calculations for the months they cover
 
-7. **Historical Adjustments**: Past period calculations (differences between forecasted and actual) must be incorporated into future payslips
+8. **Historical Adjustments**: Past period calculations (differences between forecasted and actual) must be incorporated into future payslips
 
-8. **Forecast Behavior**: Each utility provider has a forecast behavior setting that determines payment calculation when no new forecast is received:
+9. **Forecast Behavior**: Each utility provider has a forecast behavior setting that determines payment calculation when no new forecast is received:
    - **Zero After Expiry**: Payment becomes $0 after forecast period expires until a new forecast is received
    - **Carry Forward**: Uses the same amounts as the previous month when no new forecast is received
 
@@ -245,6 +253,7 @@ Utility Provider Entity
 - **Payslip Configuration**: Configurable labels in Payslip model:
   - Header labels: `name_header` (default: "Pozycja"), `amount_header` (default: "Kwota"), `total_header` (default: "Razem")
   - Payment difference labels: `underpayment_label` (default: "Zaległe"), `overpayment_label` (default: "Nadpłata")
+  - Forecast adjustment label: `adjustment_label` (default: "Wyrównanie")
 
 ## Future Considerations
 
