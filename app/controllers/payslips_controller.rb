@@ -23,7 +23,7 @@ class PayslipsController < ApplicationController
   def create
     @payslip = @property_tenant.payslips.build(payslip_params)
     @payslip.property = @property
-    
+
     # Ensure month is beginning of month for uniqueness validation
     if @payslip.month.present?
       @payslip.month = @payslip.month.beginning_of_month
