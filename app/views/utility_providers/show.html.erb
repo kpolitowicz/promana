@@ -43,7 +43,7 @@
                 <%= pluralize(forecast.forecast_line_items.count, 'line item') %>
               </span>
             </div>
-            <%= link_to "Delete", property_utility_provider_forecast_path(@property, @utility_provider, forecast), method: :delete, data: {confirm: "Are you sure?"}, class: "text-red-600 hover:text-red-800 leading-none inline-block" %>
+            <%= button_to "Delete", property_utility_provider_forecast_path(@property, @utility_provider, forecast), method: :delete, data: {confirm: "Are you sure?"}, class: "text-red-600 hover:text-red-800 leading-none inline-block bg-transparent border-0 p-0 cursor-pointer font-normal", form_class: "inline" %>
           </li>
         <% end %>
       </ul>
