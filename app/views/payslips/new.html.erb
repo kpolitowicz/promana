@@ -27,6 +27,7 @@
         <div>
           <%= form.label :due_date, "Due Date", class: "block text-gray-700 text-sm font-bold mb-2" %>
           <%= form.date_field :due_date, value: @payslip.due_date, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", data: {payslip_regenerator_target: "dueDate", action: "change->payslip-regenerator#regenerate"} %>
+          <p class="text-xs text-gray-500 mt-1">Automatically updates to match the selected month</p>
         </div>
       </div>
 
