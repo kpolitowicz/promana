@@ -88,8 +88,8 @@ This application is designed to manage rental properties, tenants, and associate
   - Fixed rent (configurable per property/tenant)
   - Variable utilities for the target month (calculated based on active forecasts and forecast behavior rules)
   - **Payment Differences from Previous Month**: Automatically calculated and included as line items:
-    - **Underpayment (Zaległe)**: When tenant paid less than the previous month's payslip total, a positive amount line item is added
-    - **Overpayment (Nadpłata)**: When tenant paid more than the previous month's payslip total, a negative amount line item (credit) is added
+    - **Underpayment (Arrears)**: When tenant paid less than the previous month's payslip total, a positive amount line item is added
+    - **Overpayment (Credit)**: When tenant paid more than the previous month's payslip total, a negative amount line item (credit) is added
     - Payment differences are calculated by comparing the previous month's payslip total with all payments made in that month (based on paid_date)
     - Multiple payments in the same month are summed together
     - No difference line item is added if payments exactly match the payslip total
@@ -98,7 +98,7 @@ This application is designed to manage rental properties, tenants, and associate
   - Forecast behavior rules when no forecast exists (zero after expiry or carry forward)
 - Payslips are viewable as HTML/web pages in tabular format with line items and total
 - Payslips can be generated, saved, and deleted through web interface
-- **Configurable Labels**: Payment difference labels (Zaległe, Nadpłata) are configurable in the Payslip model
+- **Configurable Labels**: Payment difference labels (Arrears, Credit) are configurable in the Payslip model
 
 ### 3. Utility Update Workflow
 
@@ -118,7 +118,7 @@ This application is designed to manage rental properties, tenants, and associate
 - Each property can have multiple utility providers
 - Forecasts have an issued date
 - **Forecast Line Items**: Each forecast can have multiple line items with:
-  - Name (e.g., "Forecast", "Rozliczenie" for settlement/differences)
+  - Name (e.g., "Forecast", "Settlement" for settlement/differences)
   - Amount (can be positive, negative, or zero - negative amounts represent refunds/credits)
   - Due date (payment due date)
 - All line items within a forecast must be enterable and trackable separately
@@ -145,8 +145,8 @@ This application is designed to manage rental properties, tenants, and associate
     - Finds all tenant payments made in that month (based on paid_date)
     - Calculates the difference between payslip total and total payments
     - Includes a difference line item in the current month's payslip:
-      - **Underpayment (Zaległe)**: Positive amount when tenant paid less than payslip total
-      - **Overpayment (Nadpłata)**: Negative amount (credit) when tenant paid more than payslip total
+      - **Underpayment (Arrears)**: Positive amount when tenant paid less than payslip total
+      - **Overpayment (Credit)**: Negative amount (credit) when tenant paid more than payslip total
   - Multiple payments in the same month are automatically summed
   - No difference line item is added if payments exactly match the payslip total
   - Payment differences are configurable via Payslip model class methods
@@ -169,7 +169,7 @@ This application is designed to manage rental properties, tenants, and associate
 
 4. **Single-User Application**: No authentication or multi-user support required
 
-5. **Payment Adjustments**: When payments arrive after payslip generation, the difference is automatically calculated and included in the next month's payslip as a line item (Zaległe for underpayment, Nadpłata for overpayment)
+5. **Payment Adjustments**: When payments arrive after payslip generation, the difference is automatically calculated and included in the next month's payslip as a line item (Arrears for underpayment, Credit for overpayment)
 
 6. **Forecast Impact**: Payment forecasts affect tenant payslip calculations for the months they cover
 
