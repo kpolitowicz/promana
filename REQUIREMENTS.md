@@ -87,12 +87,18 @@ This application is designed to manage rental properties, tenants, and associate
 - Payslips include:
   - Fixed rent (configurable per property/tenant)
   - Variable utilities for the target month (calculated based on active forecasts and forecast behavior rules)
-  - Adjustments from previous months (when applicable)
+  - **Payment Differences from Previous Month**: Automatically calculated and included as line items:
+    - **Underpayment (Zaległe)**: When tenant paid less than the previous month's payslip total, a positive amount line item is added
+    - **Overpayment (Nadpłata)**: When tenant paid more than the previous month's payslip total, a negative amount line item (credit) is added
+    - Payment differences are calculated by comparing the previous month's payslip total with all payments made in that month (based on paid_date)
+    - Multiple payments in the same month are summed together
+    - No difference line item is added if payments exactly match the payslip total
 - Utility amounts are determined by:
   - Active forecasts for the target month (if available)
   - Forecast behavior rules when no forecast exists (zero after expiry or carry forward)
 - Payslips are viewable as HTML/web pages in tabular format with line items and total
 - Payslips can be generated, saved, and deleted through web interface
+- **Configurable Labels**: Payment difference labels (Zaległe, Nadpłata) are configurable in the Payslip model
 
 ### 3. Utility Update Workflow
 
@@ -126,20 +132,24 @@ This application is designed to manage rental properties, tenants, and associate
   - Payments are associated with property-tenant relationships
   - Full CRUD interface for managing tenant payments
   - Accessible from property show page (Payments link next to Payslips)
+  - Payments are matched to payslips by checking if paid_date falls within the payslip's month
 - **Utility Payment Tracking**: Track payments made to utility providers
   - Record payment amount and paid date for each utility provider payment
   - Payments are associated with utility providers and properties
   - Full CRUD interface for managing utility payments
   - Accessible from utility provider show page
-- **Critical Workflow**: Payments are often received AFTER payslips have been generated for that month
-- When actual payments differ from what was included in the payslip:
-  - The difference must be calculated
-  - The difference must be accounted for in the NEXT month's payslip
-- System must track:
-  - What was included in each payslip
-  - What was actually paid/received (via payment tracking)
-  - The difference/adjustment amount
-  - Application of adjustments to subsequent payslips
+- **Automatic Payment Difference Calculation**: 
+  - **Critical Workflow**: Payments are often received AFTER payslips have been generated for that month
+  - When generating a payslip, the system automatically:
+    - Finds the previous month's payslip (if it exists)
+    - Finds all tenant payments made in that month (based on paid_date)
+    - Calculates the difference between payslip total and total payments
+    - Includes a difference line item in the current month's payslip:
+      - **Underpayment (Zaległe)**: Positive amount when tenant paid less than payslip total
+      - **Overpayment (Nadpłata)**: Negative amount (credit) when tenant paid more than payslip total
+  - Multiple payments in the same month are automatically summed
+  - No difference line item is added if payments exactly match the payslip total
+  - Payment differences are configurable via Payslip model class methods
 
 ### 6. Vendor Payment Reports
 - Generate monthly reports showing amounts owed to each utility provider entity
@@ -159,7 +169,7 @@ This application is designed to manage rental properties, tenants, and associate
 
 4. **Single-User Application**: No authentication or multi-user support required
 
-5. **Payment Adjustments**: When payments arrive after payslip generation, the difference is automatically included in the next month's payslip
+5. **Payment Adjustments**: When payments arrive after payslip generation, the difference is automatically calculated and included in the next month's payslip as a line item (Zaległe for underpayment, Nadpłata for overpayment)
 
 6. **Forecast Impact**: Payment forecasts affect tenant payslip calculations for the months they cover
 
