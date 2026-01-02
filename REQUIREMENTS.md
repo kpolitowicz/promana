@@ -247,7 +247,11 @@ Utility Provider Entity
   - Automatic regeneration of line items when month/due date changes
   - View payslips in tabular format with line items and totals
 - **Navigation**: Easy navigation between all major sections
+  - House icon in navbar links to home page (properties index)
+  - Properties and Tenants links aligned to the left in navbar
 - **Data Management**: Ability to delete entities with confirmation dialogs
+  - Delete confirmations show entity name and warn that action cannot be undone
+  - All delete operations use Turbo-compatible confirmation dialogs
 - **Form Validation**: Client and server-side validation with error messages
 
 ## Technical Implementation
