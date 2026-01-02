@@ -120,14 +120,24 @@ This application is designed to manage rental properties, tenants, and associate
 - Forecasts can be updated or corrected
 - Create, edit, and delete forecasts through web interface
 
-### 5. Payment Timing & Adjustment Handling
+### 5. Payment Tracking & Adjustment Handling
+- **Tenant Payment Tracking**: Track payments received from tenants
+  - Record payment amount and paid date for each tenant payment
+  - Payments are associated with property-tenant relationships
+  - Full CRUD interface for managing tenant payments
+  - Accessible from property show page (Payments link next to Payslips)
+- **Utility Payment Tracking**: Track payments made to utility providers
+  - Record payment amount and paid date for each utility provider payment
+  - Payments are associated with utility providers and properties
+  - Full CRUD interface for managing utility payments
+  - Accessible from utility provider show page
 - **Critical Workflow**: Payments are often received AFTER payslips have been generated for that month
 - When actual payments differ from what was included in the payslip:
   - The difference must be calculated
   - The difference must be accounted for in the NEXT month's payslip
 - System must track:
   - What was included in each payslip
-  - What was actually paid/received
+  - What was actually paid/received (via payment tracking)
   - The difference/adjustment amount
   - Application of adjustments to subsequent payslips
 
@@ -165,8 +175,12 @@ This application is designed to manage rental properties, tenants, and associate
 Property
   ├── Tenant(s)
   ├── Rent (fixed, editable)
+  ├── Tenant Payments (payments received from tenants)
   └── Utility Providers (multiple)
-      └── Utilities (various types: heating, water, waste, energy, etc.)
+      ├── Utilities (various types: heating, water, waste, energy, etc.)
+      ├── Forecasts (future months)
+      │   └── Itemized Forecasts (line items per utility type)
+      └── Utility Payments (payments made to providers)
 
 Payslip (monthly)
   ├── Tenant
@@ -181,10 +195,7 @@ Utility Provider Entity
   ├── Utility Types (heating, water, waste, energy, etc.)
   ├── Forecasts (future months)
   │   └── Itemized Forecasts (line items per utility type)
-  └── Actuals (past periods with differences)
-
-Vendor Payments
-  └── Utility Provider Entities (multiple per property)
+  └── Utility Payments (payments made to provider)
 ```
 
 ## User Interface
@@ -197,6 +208,8 @@ Vendor Payments
   - Utility Providers (with forecast behavior and utility type associations, nested under properties)
   - Property-Tenant Assignments (with rent amounts, nested under properties)
   - Forecasts (with itemized line items)
+  - Tenant Payments (payments received from tenants, tracked by paid date and amount, nested under property-tenants)
+  - Utility Payments (payments made to utility providers, tracked by paid date and amount, nested under utility providers)
 - **Payslip Management**: View, generate, save, and delete payslips through web interface
   - Generate payslips with automatic calculation of utilities based on forecasts
   - Override month and due date during generation
@@ -228,5 +241,5 @@ Vendor Payments
 - Notification system for when forecasts or actuals are received
 - XLSX file import functionality for bulk data entry
 - Vendor payment reports UI
-- Actual payment entry interface
+- Payment adjustment calculations (automatically calculating differences between payslips and actual payments)
 
