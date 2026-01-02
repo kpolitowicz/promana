@@ -11,8 +11,8 @@ RSpec.describe "UtilityTypes", type: :request do
     it "displays all utility types" do
       # Fixtures already create utility types
       get utility_types_path
-      expect(response.body).to include("Energia")
-      expect(response.body).to include("Zarządca")
+      expect(response.body).to include("Energy")
+      expect(response.body).to include("Property Management")
     end
   end
 
@@ -50,9 +50,9 @@ RSpec.describe "UtilityTypes", type: :request do
       end
 
       it "does not create duplicate utility types" do
-        # Fixture already creates utility_type_energia with name "Energia"
+        # Fixture already creates utility_type_energia with name "Energy"
         expect {
-          post utility_types_path, params: {utility_type: {name: "Energia"}}
+          post utility_types_path, params: {utility_type: {name: "Energy"}}
         }.not_to change(UtilityType, :count)
       end
     end
