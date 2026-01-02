@@ -133,7 +133,32 @@ This application is designed to manage rental properties, tenants, and associate
 - Forecasts can be updated or corrected
 - Create, edit, and delete forecasts through web interface
 
-### 5. Payment Tracking & Adjustment Handling
+### 5. Balance Sheets
+- **Tenant Balance Sheets**: Consolidated monthly balance sheets for each tenant
+  - Persisted balance sheet entries for each month showing:
+    - Month (beginning of month date)
+    - Due date (from payslip or default 10th of month)
+    - Owed: Sum of all payslip line item amounts for the month (including late-arriving forecasts)
+    - Paid: Sum of all tenant payment amounts where paid_date falls within the month
+    - Balance: Difference between owed and paid
+  - Balance sheets are accessible from the property tenant show page
+  - "Update" button generates missing months for older entries (never updating numbers in them) and recalculates the current month's entry
+  - Current balance (sum of all balance sheet balances) is displayed at the top of the page
+  - Balance sheets are ordered by due_date descending
+  - Late-arriving forecasts: If a forecast is received after a payslip was generated for a month, the forecast amounts are included in the balance sheet for that month (not carried over to the next month)
+- **Utility Provider Balance Sheets**: Consolidated monthly balance sheets for each utility provider
+  - Persisted balance sheet entries for each month showing:
+    - Month (beginning of month date)
+    - Due date (from earliest forecast line item for the month or default 10th of month)
+    - Owed: Sum of all forecast line item amounts due in the month
+    - Paid: Sum of all utility payment amounts where paid_date falls within the month
+    - Balance: Difference between owed and paid
+  - Balance sheets are accessible from the utility provider show page
+  - "Update" button generates missing months for older entries (never updating numbers in them) and recalculates the current month's entry
+  - Current balance (sum of all balance sheet balances) is displayed at the top of the page
+  - Balance sheets are ordered by due_date descending
+
+### 6. Payment Tracking & Adjustment Handling
 - **Tenant Payment Tracking**: Track payments received from tenants
   - Record payment amount and paid date for each tenant payment
   - Payments are associated with property-tenant relationships
@@ -171,7 +196,7 @@ This application is designed to manage rental properties, tenants, and associate
   - Negative adjustments indicate overcharging (credit to tenant)
   - Forecast adjustments are configurable via Payslip model class methods
 
-### 6. Vendor Payment Reports
+### 7. Vendor Payment Reports
 - Generate monthly reports showing amounts owed to each utility provider entity
 - Each property can have multiple utility providers
 - Reports should reflect:
@@ -260,7 +285,7 @@ Utility Provider Entity
 - **Ruby Version**: 4.0.0
 - **Database**: SQLite3 (development/test), with support for production database configuration
 - **Styling**: Tailwind CSS for responsive, modern UI
-- **Testing**: RSpec for comprehensive test coverage (226 examples, 0 failures)
+- **Testing**: RSpec for comprehensive test coverage (263 examples, 0 failures)
 - **Code Quality**: StandardRB for Ruby code style enforcement
 - **Production Deployment**: `bin/prod` script for production server startup
   - Automatically runs database migrations

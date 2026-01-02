@@ -22,11 +22,11 @@ class TenantBalanceSheetCalculator
         .where("forecast_line_items.due_date >= ? AND forecast_line_items.due_date <= ?", month_begin, month_end)
 
       # If payslip exists, only include forecasts issued after it was created
-      if payslip
-        query = query.where("forecasts.issued_date > ?", payslip.created_at)
+      query = if payslip
+        query.where("forecasts.issued_date > ?", payslip.created_at)
       else
         # If no payslip, include all forecasts issued before end of month
-        query = query.where("forecasts.issued_date <= ?", month_end)
+        query.where("forecasts.issued_date <= ?", month_end)
       end
 
       forecast_total += query.sum(:amount)
