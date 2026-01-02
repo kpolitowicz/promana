@@ -44,7 +44,7 @@ RSpec.describe "Payslips", type: :request do
     let(:due_date) { Date.new(month.year, month.month, 10) }
     let(:payslip_line_items_attributes) do
       {
-        "0" => {name: "Rent", amount: "1000.00"},
+        "0" => {name: Payslip.rent_label, amount: "1000.00"},
         "1" => {name: "Utilities", amount: "250.50"}
       }
     end
@@ -101,7 +101,7 @@ RSpec.describe "Payslips", type: :request do
     let(:payslip) { Payslip.create!(property: property, property_tenant: property_tenant, month: Date.today, due_date: Date.today + 10.days) }
 
     before do
-      payslip.payslip_line_items.create!(name: "Rent", amount: 1000.00)
+      payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 1000.00)
       payslip.payslip_line_items.create!(name: "Utilities", amount: 250.50)
     end
 
@@ -115,7 +115,7 @@ RSpec.describe "Payslips", type: :request do
     let!(:payslip) { Payslip.create!(property: property, property_tenant: property_tenant, month: Date.today, due_date: Date.today + 10.days) }
 
     before do
-      payslip.payslip_line_items.create!(name: "Rent", amount: 1000.00)
+      payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 1000.00)
     end
 
     it "deletes the payslip and its line items" do

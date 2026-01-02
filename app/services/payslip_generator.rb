@@ -11,7 +11,7 @@ class PayslipGenerator
 
     # Add rent line item
     line_items << {
-      name: "Rent",
+      name: Payslip.rent_label,
       amount: @property_tenant.rent_amount
     }
 

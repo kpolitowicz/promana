@@ -43,4 +43,9 @@ class Payslip < ApplicationRecord
   def self.adjustment_label
     "Wyrównanie"
   end
+
+  # Configurable label for rent
+  def self.rent_label
+    "Czynsz"
+  end
 end

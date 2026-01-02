@@ -16,7 +16,7 @@ RSpec.describe PayslipLineItem, type: :model do
 
   describe "validations" do
     it "is valid with name and amount" do
-      line_item = PayslipLineItem.new(payslip: payslip, name: "Rent", amount: 1000.00)
+      line_item = PayslipLineItem.new(payslip: payslip, name: Payslip.rent_label, amount: 1000.00)
       expect(line_item).to be_valid
     end
 
@@ -27,13 +27,13 @@ RSpec.describe PayslipLineItem, type: :model do
     end
 
     it "requires amount" do
-      line_item = PayslipLineItem.new(payslip: payslip, name: "Rent")
+      line_item = PayslipLineItem.new(payslip: payslip, name: Payslip.rent_label)
       expect(line_item).not_to be_valid
       expect(line_item.errors[:amount]).to include("can't be blank")
     end
 
     it "validates amount is numeric" do
-      line_item = PayslipLineItem.new(payslip: payslip, name: "Rent", amount: "not a number")
+      line_item = PayslipLineItem.new(payslip: payslip, name: Payslip.rent_label, amount: "not a number")
       expect(line_item).not_to be_valid
       expect(line_item.errors[:amount]).to include("is not a number")
     end

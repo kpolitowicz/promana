@@ -55,7 +55,7 @@ RSpec.describe Payslip, type: :model do
   describe "#total_amount" do
     it "sums all line item amounts" do
       payslip = Payslip.create!(property: property, property_tenant: property_tenant, month: Date.today, due_date: Date.today)
-      payslip.payslip_line_items.create!(name: "Rent", amount: 1000.00)
+      payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 1000.00)
       payslip.payslip_line_items.create!(name: "Utilities", amount: 250.50)
       expect(payslip.total_amount).to eq(1250.50)
     end
@@ -100,6 +100,12 @@ RSpec.describe Payslip, type: :model do
   describe ".overpayment_label" do
     it "returns the overpayment label" do
       expect(Payslip.overpayment_label).to eq("Nadpłata")
+    end
+  end
+
+  describe ".rent_label" do
+    it "returns the rent label" do
+      expect(Payslip.rent_label).to eq("Czynsz")
     end
   end
 end

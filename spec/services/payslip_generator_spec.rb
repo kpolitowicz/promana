@@ -13,7 +13,7 @@ RSpec.describe PayslipGenerator do
         result = generator.generate
 
         expect(result[:line_items].length).to eq(1)
-        expect(result[:line_items].first[:name]).to eq("Rent")
+        expect(result[:line_items].first[:name]).to eq(Payslip.rent_label)
         expect(result[:line_items].first[:amount]).to eq(1000.00)
       end
     end
@@ -29,7 +29,7 @@ RSpec.describe PayslipGenerator do
         result = generator.generate
 
         expect(result[:line_items].length).to eq(2)
-        expect(result[:line_items].map { |item| item[:name] }).to contain_exactly("Rent", "Test Provider - Forecast")
+        expect(result[:line_items].map { |item| item[:name] }).to contain_exactly(Payslip.rent_label, "Test Provider - Forecast")
         utility_item = result[:line_items].find { |item| item[:name] == "Test Provider - Forecast" }
         expect(utility_item[:amount]).to eq(250.00)
       end
@@ -42,7 +42,7 @@ RSpec.describe PayslipGenerator do
         result = generator.generate
 
         expect(result[:line_items].length).to eq(3)
-        expect(result[:line_items].map { |item| item[:name] }).to contain_exactly("Rent", "Test Provider - Forecast", "Test Provider - Rozliczenie")
+        expect(result[:line_items].map { |item| item[:name] }).to contain_exactly(Payslip.rent_label, "Test Provider - Forecast", "Test Provider - Rozliczenie")
         forecast_item = result[:line_items].find { |item| item[:name] == "Test Provider - Forecast" }
         rozliczenie_item = result[:line_items].find { |item| item[:name] == "Test Provider - Rozliczenie" }
         expect(forecast_item[:amount]).to eq(200.00)
@@ -58,7 +58,7 @@ RSpec.describe PayslipGenerator do
         result = generator.generate
 
         expect(result[:line_items].length).to eq(1)
-        expect(result[:line_items].first[:name]).to eq("Rent")
+        expect(result[:line_items].first[:name]).to eq(Payslip.rent_label)
       end
     end
 
@@ -81,7 +81,7 @@ RSpec.describe PayslipGenerator do
         result = generator.generate
 
         expect(result[:line_items].length).to eq(1)
-        expect(result[:line_items].first[:name]).to eq("Rent")
+        expect(result[:line_items].first[:name]).to eq(Payslip.rent_label)
       end
     end
 
@@ -99,7 +99,7 @@ RSpec.describe PayslipGenerator do
         result = generator.generate
 
         expect(result[:line_items].length).to eq(3)
-        expect(result[:line_items].map { |item| item[:name] }).to contain_exactly("Rent", "Provider 1 - Forecast", "Provider 2 - Forecast")
+        expect(result[:line_items].map { |item| item[:name] }).to contain_exactly(Payslip.rent_label, "Provider 1 - Forecast", "Provider 2 - Forecast")
       end
     end
 
@@ -129,7 +129,7 @@ RSpec.describe PayslipGenerator do
             month: january_2026,
             due_date: Date.new(2026, 1, 10)
           )
-          january_payslip.payslip_line_items.create!(name: "Rent", amount: 2000.00)
+          january_payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 2000.00)
 
           # Tenant paid only 1500 in January
           TenantPayment.create!(
@@ -159,7 +159,7 @@ RSpec.describe PayslipGenerator do
             month: january_2026,
             due_date: Date.new(2026, 1, 10)
           )
-          january_payslip.payslip_line_items.create!(name: "Rent", amount: 2000.00)
+          january_payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 2000.00)
 
           # Tenant paid 2100 in January (overpaid by 100)
           TenantPayment.create!(
@@ -189,7 +189,7 @@ RSpec.describe PayslipGenerator do
             month: january_2026,
             due_date: Date.new(2026, 1, 10)
           )
-          january_payslip.payslip_line_items.create!(name: "Rent", amount: 2000.00)
+          january_payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 2000.00)
 
           # Tenant paid exactly 2000 in January
           TenantPayment.create!(
@@ -230,7 +230,7 @@ RSpec.describe PayslipGenerator do
             month: january_2026,
             due_date: Date.new(2026, 1, 10)
           )
-          january_payslip.payslip_line_items.create!(name: "Rent", amount: 2000.00)
+          january_payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 2000.00)
 
           # Tenant made two payments: 1000 + 600 = 1600 (underpaid by 400)
           TenantPayment.create!(
@@ -282,7 +282,7 @@ RSpec.describe PayslipGenerator do
             due_date: Date.new(2026, 2, 10),
             created_at: Time.zone.parse("2026-01-26")
           )
-          february_payslip.payslip_line_items.create!(name: "Rent", amount: 700.00)
+          february_payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 700.00)
           february_payslip.payslip_line_items.create!(name: "Management - Waste", amount: 100.00)
           february_payslip.payslip_line_items.create!(name: "Management - Water", amount: 200.00)
 
@@ -324,7 +324,7 @@ RSpec.describe PayslipGenerator do
             due_date: Date.new(2026, 2, 10),
             created_at: Time.zone.parse("2026-01-26")
           )
-          february_payslip.payslip_line_items.create!(name: "Rent", amount: 700.00)
+          february_payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 700.00)
           february_payslip.payslip_line_items.create!(name: "Management - Waste", amount: 100.00)
 
           # Generate March payslip (no new forecast after payslip creation)
@@ -346,7 +346,7 @@ RSpec.describe PayslipGenerator do
             due_date: Date.new(2026, 2, 10),
             created_at: Time.zone.parse("2026-01-26")
           )
-          february_payslip.payslip_line_items.create!(name: "Rent", amount: 700.00)
+          february_payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 700.00)
           february_payslip.payslip_line_items.create!(name: "Management - Waste", amount: 100.00)
           february_payslip.payslip_line_items.create!(name: "Management - Water", amount: 200.00)
 
@@ -382,7 +382,7 @@ RSpec.describe PayslipGenerator do
             due_date: Date.new(2026, 2, 10),
             created_at: Time.zone.parse("2026-01-26")
           )
-          february_payslip.payslip_line_items.create!(name: "Rent", amount: 700.00)
+          february_payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 700.00)
           february_payslip.payslip_line_items.create!(name: "Management - Waste", amount: 100.00)
           february_payslip.payslip_line_items.create!(name: "Energy Provider - Forecast", amount: 50.00)
 

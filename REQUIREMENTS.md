@@ -276,6 +276,7 @@ Utility Provider Entity
   - Header labels: `name_header` (default: "Pozycja"), `amount_header` (default: "Kwota"), `total_header` (default: "Razem")
   - Payment difference labels: `underpayment_label` (default: "Zaległe"), `overpayment_label` (default: "Nadpłata")
   - Forecast adjustment label: `adjustment_label` (default: "Wyrównanie")
+  - Rent label: `rent_label` (default: "Czynsz")
 
 ## Future Considerations
 
