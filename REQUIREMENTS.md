@@ -81,16 +81,18 @@ This application is designed to manage rental properties, tenants, and associate
 - View tenant details including associated properties
 
 ### 2. Monthly Payslip Generation
-- Generate payslips for all tenants each month
+- Generate payslips for tenants each month
+- **Month and Due Date Override**: Ability to override the target month (default: next month) and due date (default: 10th of the target month)
+- **Automatic Regeneration**: Payslip line items automatically regenerate when month or due date is changed in the form
 - Payslips include:
   - Fixed rent (configurable per property/tenant)
-  - Variable utilities for the current month (calculated based on active forecasts and forecast behavior rules)
+  - Variable utilities for the target month (calculated based on active forecasts and forecast behavior rules)
   - Adjustments from previous months (when applicable)
 - Utility amounts are determined by:
-  - Active forecasts for the month (if available)
+  - Active forecasts for the target month (if available)
   - Forecast behavior rules when no forecast exists (zero after expiry or carry forward)
-- Payslips are viewable as HTML/web pages
-- Payslips can be generated/regenerated as needed
+- Payslips are viewable as HTML/web pages in tabular format with line items and total
+- Payslips can be generated, saved, and deleted through web interface
 
 ### 3. Utility Update Workflow
 
