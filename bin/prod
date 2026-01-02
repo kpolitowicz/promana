@@ -4,8 +4,8 @@
 # This script prepares and starts the Rails server in production mode
 #
 # Usage:
-#   bin/prod                    # Start server on port 3000
-#   PORT=8080 bin/prod          # Start server on custom port
+#   bin/prod                    # Start server on port 8080
+#   PORT=3000 bin/prod          # Start server on custom port
 #   SKIP_MIGRATE=1 bin/prod     # Skip database migrations
 #   SKIP_ASSETS=1 bin/prod      # Skip asset precompilation
 
