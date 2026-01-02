@@ -1,0 +1,41 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">New Payment</h1>
+    <p class="mt-1 text-sm text-gray-500">
+      Tenant: <%= @property_tenant.tenant.name %> | Property: <%= link_to @property.name, property_path(@property), class: "text-blue-600 hover:text-blue-800" %>
+    </p>
+  </div>
+
+  <%= form_with(model: [@property, @property_tenant, @tenant_payment], local: true, class: "bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4") do |form| %>
+    <% if @tenant_payment.errors.any? %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <h2 class="font-bold"><%= pluralize(@tenant_payment.errors.count, "error") %> prohibited this payment from being saved:</h2>
+        <ul class="list-disc list-inside">
+          <% @tenant_payment.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="mb-4">
+      <%= form.label :month, class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.date_field :month, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+
+    <div class="mb-4">
+      <%= form.label :amount, class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.number_field :amount, step: 0.01, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+
+    <div class="mb-4">
+      <%= form.label :paid_date, class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.date_field :paid_date, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <%= form.submit "Create Payment", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+      <%= link_to "Cancel", property_property_tenant_tenant_payments_path(@property, @property_tenant), class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" %>
+    </div>
+  <% end %>
+</div>

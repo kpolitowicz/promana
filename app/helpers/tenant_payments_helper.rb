@@ -1,0 +1,2 @@
+module TenantPaymentsHelper
+end
