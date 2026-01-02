@@ -90,4 +90,16 @@ RSpec.describe Payslip, type: :model do
       expect(Payslip.total_header).to eq("Razem")
     end
   end
+
+  describe ".underpayment_label" do
+    it "returns the underpayment label" do
+      expect(Payslip.underpayment_label).to eq("Zaległe")
+    end
+  end
+
+  describe ".overpayment_label" do
+    it "returns the overpayment label" do
+      expect(Payslip.overpayment_label).to eq("Nadpłata")
+    end
+  end
 end

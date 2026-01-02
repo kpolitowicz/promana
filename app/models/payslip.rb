@@ -29,4 +29,13 @@ class Payslip < ApplicationRecord
   def self.total_header
     "Razem"
   end
+
+  # Configurable labels for payment differences
+  def self.underpayment_label
+    "Zaległe"
+  end
+
+  def self.overpayment_label
+    "Nadpłata"
+  end
 end

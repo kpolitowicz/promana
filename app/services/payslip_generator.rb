@@ -26,6 +26,15 @@ class PayslipGenerator
       end
     end
 
+    # Add payment difference from previous month if applicable
+    payment_diff = calculate_payment_difference
+    if payment_diff && payment_diff[:amount] != 0
+      line_items << {
+        name: payment_diff[:label],
+        amount: payment_diff[:amount]
+      }
+    end
+
     {
       property: @property,
       property_tenant: @property_tenant,
@@ -73,5 +82,39 @@ class PayslipGenerator
       .distinct
       .order(issued_date: :desc)
       .first
+  end
+
+  def calculate_payment_difference
+    previous_month = @month - 1.month
+    previous_payslip = @property_tenant.payslips.find_by(month: previous_month.beginning_of_month)
+
+    return nil unless previous_payslip
+
+    # Find payments made in the previous month (paid_date falls within that month)
+    payments_in_month = @property_tenant.tenant_payments.where(
+      "paid_date >= ? AND paid_date < ?",
+      previous_month.beginning_of_month,
+      previous_month.next_month.beginning_of_month
+    )
+
+    total_paid = payments_in_month.sum(:amount)
+    payslip_total = previous_payslip.total_amount
+    difference = total_paid - payslip_total
+
+    return nil if difference == 0
+
+    if difference > 0
+      # Overpayment - negative amount (credit to tenant)
+      {
+        label: Payslip.overpayment_label,
+        amount: -difference
+      }
+    else
+      # Underpayment - positive amount (debt owed)
+      {
+        label: Payslip.underpayment_label,
+        amount: -difference # difference is negative, so negate it to get positive
+      }
+    end
   end
 end

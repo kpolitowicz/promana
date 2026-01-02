@@ -115,5 +115,147 @@ RSpec.describe PayslipGenerator do
         expect(result[:due_date]).to eq(custom_due_date)
       end
     end
+
+    context "with payment differences from previous month" do
+      let(:january_2026) { Date.new(2026, 1, 1) }
+      let(:february_2026) { Date.new(2026, 2, 1) }
+
+      context "when tenant underpaid previous month" do
+        it "includes underpayment line item (Zaległe) in next month's payslip" do
+          # Create January payslip with total 2000
+          january_payslip = Payslip.create!(
+            property: property,
+            property_tenant: property_tenant,
+            month: january_2026,
+            due_date: Date.new(2026, 1, 10)
+          )
+          january_payslip.payslip_line_items.create!(name: "Rent", amount: 2000.00)
+
+          # Tenant paid only 1500 in January
+          TenantPayment.create!(
+            property_tenant: property_tenant,
+            property: property,
+            amount: 1500.00,
+            paid_date: Date.new(2026, 1, 15)
+          )
+
+          # Generate February payslip
+          generator = PayslipGenerator.new(property_tenant, month: february_2026)
+          result = generator.generate
+
+          # Should include underpayment line item
+          diff_item = result[:line_items].find { |item| item[:name] == Payslip.underpayment_label }
+          expect(diff_item).not_to be_nil
+          expect(diff_item[:amount]).to eq(500.00) # 2000 - 1500 = 500
+        end
+      end
+
+      context "when tenant overpaid previous month" do
+        it "includes overpayment line item (Nadpłata) in next month's payslip" do
+          # Create January payslip with total 2000
+          january_payslip = Payslip.create!(
+            property: property,
+            property_tenant: property_tenant,
+            month: january_2026,
+            due_date: Date.new(2026, 1, 10)
+          )
+          january_payslip.payslip_line_items.create!(name: "Rent", amount: 2000.00)
+
+          # Tenant paid 2100 in January (overpaid by 100)
+          TenantPayment.create!(
+            property_tenant: property_tenant,
+            property: property,
+            amount: 2100.00,
+            paid_date: Date.new(2026, 1, 15)
+          )
+
+          # Generate February payslip
+          generator = PayslipGenerator.new(property_tenant, month: february_2026)
+          result = generator.generate
+
+          # Should include overpayment line item (negative amount)
+          diff_item = result[:line_items].find { |item| item[:name] == Payslip.overpayment_label }
+          expect(diff_item).not_to be_nil
+          expect(diff_item[:amount]).to eq(-100.00) # 2000 - 2100 = -100 (credit)
+        end
+      end
+
+      context "when tenant paid exactly the payslip amount" do
+        it "does not include any difference line item" do
+          # Create January payslip with total 2000
+          january_payslip = Payslip.create!(
+            property: property,
+            property_tenant: property_tenant,
+            month: january_2026,
+            due_date: Date.new(2026, 1, 10)
+          )
+          january_payslip.payslip_line_items.create!(name: "Rent", amount: 2000.00)
+
+          # Tenant paid exactly 2000 in January
+          TenantPayment.create!(
+            property_tenant: property_tenant,
+            property: property,
+            amount: 2000.00,
+            paid_date: Date.new(2026, 1, 15)
+          )
+
+          # Generate February payslip
+          generator = PayslipGenerator.new(property_tenant, month: february_2026)
+          result = generator.generate
+
+          # Should not include any difference line item
+          expect(result[:line_items].none? { |item| item[:name] == Payslip.underpayment_label }).to be true
+          expect(result[:line_items].none? { |item| item[:name] == Payslip.overpayment_label }).to be true
+        end
+      end
+
+      context "when no previous payslip exists" do
+        it "does not include any difference line item" do
+          # Generate February payslip without January payslip
+          generator = PayslipGenerator.new(property_tenant, month: february_2026)
+          result = generator.generate
+
+          # Should not include any difference line item
+          expect(result[:line_items].none? { |item| item[:name] == Payslip.underpayment_label }).to be true
+          expect(result[:line_items].none? { |item| item[:name] == Payslip.overpayment_label }).to be true
+        end
+      end
+
+      context "when multiple payments were made in previous month" do
+        it "sums all payments and calculates total difference" do
+          # Create January payslip with total 2000
+          january_payslip = Payslip.create!(
+            property: property,
+            property_tenant: property_tenant,
+            month: january_2026,
+            due_date: Date.new(2026, 1, 10)
+          )
+          january_payslip.payslip_line_items.create!(name: "Rent", amount: 2000.00)
+
+          # Tenant made two payments: 1000 + 600 = 1600 (underpaid by 400)
+          TenantPayment.create!(
+            property_tenant: property_tenant,
+            property: property,
+            amount: 1000.00,
+            paid_date: Date.new(2026, 1, 15)
+          )
+          TenantPayment.create!(
+            property_tenant: property_tenant,
+            property: property,
+            amount: 600.00,
+            paid_date: Date.new(2026, 1, 20)
+          )
+
+          # Generate February payslip
+          generator = PayslipGenerator.new(property_tenant, month: february_2026)
+          result = generator.generate
+
+          # Should include underpayment line item for 400
+          diff_item = result[:line_items].find { |item| item[:name] == Payslip.underpayment_label }
+          expect(diff_item).not_to be_nil
+          expect(diff_item[:amount]).to eq(400.00) # 2000 - 1600 = 400
+        end
+      end
+    end
   end
 end
