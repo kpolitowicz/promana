@@ -4,4 +4,12 @@ class ApplicationController < ActionController::Base
 
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
+
+  before_action :load_properties_for_navbar
+
+  private
+
+  def load_properties_for_navbar
+    @navbar_properties = Property.order(:name)
+  end
 end

@@ -29,8 +29,52 @@
         <%= link_to root_path, class: "text-white flex items-center hover:text-blue-200" do %>
           <img src="/icon.svg" alt="Home" width="24" height="24" class="w-6 h-6">
         <% end %>
-        <%= link_to "Properties", properties_path, class: "hover:text-blue-200" %>
-        <%= link_to "Settings", settings_path, class: "hover:text-blue-200" %>
+        
+        <!-- Properties Dropdown -->
+        <div class="relative" data-controller="dropdown" data-action="mouseenter->dropdown#mouseEnter mouseleave->dropdown#mouseLeave">
+          <button class="hover:text-blue-200 flex items-center focus:outline-none">
+            Properties
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          <div data-dropdown-target="menu" class="hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+            <% if @navbar_properties.present? %>
+              <% @navbar_properties.each do |property| %>
+                <%= link_to property_path(property), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600" do %>
+                  <%= property.name %>
+                <% end %>
+              <% end %>
+            <% else %>
+              <div class="px-4 py-2 text-sm text-gray-500 italic">
+                No properties yet
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+        <!-- Settings Dropdown -->
+        <div class="relative" data-controller="dropdown" data-action="mouseenter->dropdown#mouseEnter mouseleave->dropdown#mouseLeave">
+          <button class="hover:text-blue-200 flex items-center focus:outline-none">
+            Settings
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          <div data-dropdown-target="menu" class="hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+            <%= link_to property_settings_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600" do %>
+              Properties
+            <% end %>
+            <%= link_to tenants_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600" do %>
+              Tenants
+            <% end %>
+            <%= link_to utility_types_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600" do %>
+              Utility Types
+            <% end %>
+          </div>
+        </div>
       </div>
     </nav>
     <main class="container mx-auto mt-20 px-5">

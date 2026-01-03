@@ -272,10 +272,14 @@ Utility Provider Entity
   - Override month and due date during generation
   - Automatic regeneration of line items when month/due date changes
   - View payslips in tabular format with line items and totals
-- **Navigation**: Easy navigation between all major sections
+- **Navigation**: Easy navigation between all major sections with dropdown menus
   - House icon in navbar links to home page (properties index)
-  - **Properties** link: View-only access to properties with payslips, forecasts, and balance sheets
-  - **Settings** link: Management interface for property CRUD, tenant assignment, and utility provider management
+  - **Properties dropdown**: Hover-activated menu showing all properties from the database for quick access to individual property pages
+  - **Settings dropdown**: Hover-activated menu with three configuration options:
+    - Properties: Property CRUD management
+    - Tenants: Tenant management
+    - Utility Types: Utility type management
+  - Dropdowns use Stimulus JS controllers for smooth hover interactions
   - Navigation is divided into:
     - **Properties Section**: View-only interface for viewing property data (payslips, forecasts, balance sheets)
     - **Settings Section**: Management interface for property CRUD operations, tenant assignment, and utility provider management
