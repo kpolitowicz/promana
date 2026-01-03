@@ -296,11 +296,18 @@ Utility Provider Entity
 - **Styling**: Tailwind CSS for responsive, modern UI
 - **Testing**: RSpec for comprehensive test coverage (263 examples, 0 failures)
 - **Code Quality**: StandardRB for Ruby code style enforcement
-- **Production Deployment**: `bin/prod` script for production server startup
-  - Automatically runs database migrations
-  - Precompiles assets (Propshaft)
-  - Starts Rails server in production mode
-  - Supports PORT, SKIP_MIGRATE, and SKIP_ASSETS environment variables
+- **Production Deployment**: 
+  - **`bin/prod` script**: Production server startup script
+    - Automatically runs database migrations
+    - Precompiles assets (Propshaft)
+    - Starts Rails server in production mode
+    - Supports PORT, SKIP_MIGRATE, and SKIP_ASSETS environment variables
+  - **`bin/docker-prod` script**: Docker-based production deployment
+    - Builds Docker image and runs container on port 8080 (configurable via PORT)
+    - Automatically generates SECRET_KEY_BASE if not provided
+    - Mounts `./storage` directory as volume for SQLite database persistence
+    - Supports SKIP_BUILD, SKIP_MIGRATE, and SKIP_ASSETS environment variables
+    - SQLite database files persist on host machine (not copied into container)
 - **Architecture**: Service objects for complex business logic (ForecastCalculator, PayslipGenerator)
 - **Currency Configuration**: Configurable currency symbol and position (before/after amount) via environment variables:
   - `CURRENCY_SYMBOL`: Currency symbol (default: "zł" for PLN)

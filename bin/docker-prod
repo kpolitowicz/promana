@@ -1,0 +1,94 @@
+#!/usr/bin/env sh
+
+# Docker production server startup script
+# This script builds and runs the Rails app in a Docker container
+#
+# Usage:
+#   bin/docker-prod                    # Build and start on port 8080
+#   PORT=3000 bin/docker-prod          # Start on custom port
+#   SKIP_BUILD=1 bin/docker-prod       # Skip Docker build (use existing image)
+#   SKIP_MIGRATE=1 bin/docker-prod     # Skip database migrations
+#   SKIP_ASSETS=1 bin/docker-prod      # Skip asset precompilation
+#   SECRET_KEY_BASE=xxx bin/docker-prod # Use custom secret key (auto-generated if not provided)
+
+set -e
+
+# Default to port 8080 if not specified
+export PORT="${PORT:-8080}"
+export IMAGE_NAME="${IMAGE_NAME:-promana}"
+export CONTAINER_NAME="${CONTAINER_NAME:-promana-container}"
+
+echo "Docker Production Server Startup"
+echo "================================="
+echo "Port: $PORT"
+echo "Image: $IMAGE_NAME"
+echo "Container: $CONTAINER_NAME"
+echo ""
+
+# Ensure storage directory exists
+mkdir -p storage
+
+# Generate SECRET_KEY_BASE if not provided
+if [ -z "$SECRET_KEY_BASE" ]; then
+  echo "Generating SECRET_KEY_BASE..."
+  # Try rails secret first, then openssl, then Ruby
+  if command -v rails >/dev/null 2>&1; then
+    export SECRET_KEY_BASE=$(rails secret)
+  elif command -v openssl >/dev/null 2>&1; then
+    export SECRET_KEY_BASE=$(openssl rand -hex 64)
+  elif command -v ruby >/dev/null 2>&1; then
+    export SECRET_KEY_BASE=$(ruby -e "require 'securerandom'; puts SecureRandom.hex(64)")
+  else
+    echo "Error: Cannot generate SECRET_KEY_BASE. Please install openssl or set SECRET_KEY_BASE environment variable."
+    exit 1
+  fi
+  echo "SECRET_KEY_BASE generated (not shown for security)"
+fi
+
+# Build Docker image if not skipped
+if [ -z "$SKIP_BUILD" ]; then
+  echo "Building Docker image..."
+  docker build -t "$IMAGE_NAME" .
+  echo ""
+else
+  echo "Skipping Docker build (SKIP_BUILD=1)"
+  echo ""
+fi
+
+# Stop and remove existing container if it exists
+if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+  echo "Stopping and removing existing container..."
+  docker stop "$CONTAINER_NAME" 2>/dev/null || true
+  docker rm "$CONTAINER_NAME" 2>/dev/null || true
+  echo ""
+fi
+
+# Prepare environment variables for container
+ENV_ARGS="-e SECRET_KEY_BASE=$SECRET_KEY_BASE"
+if [ -n "$SKIP_MIGRATE" ]; then
+  ENV_ARGS="$ENV_ARGS -e SKIP_MIGRATE=1"
+fi
+if [ -n "$SKIP_ASSETS" ]; then
+  ENV_ARGS="$ENV_ARGS -e SKIP_ASSETS=1"
+fi
+
+# Run the container with storage mounted as volume
+echo "Starting Docker container..."
+echo "Database will be persisted in ./storage/ directory"
+echo ""
+docker run -d \
+  --name "$CONTAINER_NAME" \
+  -p "$PORT:8080" \
+  -v "$(pwd)/storage:/rails/storage" \
+  $ENV_ARGS \
+  "$IMAGE_NAME" \
+  ./bin/prod
+
+echo ""
+echo "Container started successfully!"
+echo "Server is running on http://localhost:$PORT"
+echo ""
+echo "To view logs: docker logs -f $CONTAINER_NAME"
+echo "To stop: docker stop $CONTAINER_NAME"
+echo "To remove: docker rm $CONTAINER_NAME"
+
