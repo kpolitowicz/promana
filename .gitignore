@@ -39,3 +39,6 @@
 
 # Production seed script (contains sensitive data)
 /db/seed_production.rb
+
+# CSV data files
+/db/*.csv
