@@ -258,11 +258,12 @@ Utility Provider Entity
 
 - **Web-based Interface**: Single-page application with navigation bar
 - **CRUD Operations**: Full create, read, update, delete functionality for all entities:
-  - Properties (with address)
+  - **Properties Management** (in Settings): Create, edit, delete properties (with address)
+  - **Properties Viewing** (in Properties): View-only access to properties with associated payslips, forecasts, and balance sheets
   - Tenants (with contact information)
   - Utility Types (custom names for utility categories)
   - Utility Providers (with forecast behavior and utility type associations, nested under properties)
-  - Property-Tenant Assignments (with rent amounts, nested under properties)
+  - Property-Tenant Assignments (with rent amounts, nested under property settings)
   - Forecasts (with itemized line items)
   - Tenant Payments (payments received from tenants, tracked by paid date and amount, nested under property-tenants)
   - Utility Payments (payments made to utility providers, tracked by paid date and amount, nested under utility providers)
@@ -273,7 +274,11 @@ Utility Provider Entity
   - View payslips in tabular format with line items and totals
 - **Navigation**: Easy navigation between all major sections
   - House icon in navbar links to home page (properties index)
-  - Properties and Tenants links aligned to the left in navbar
+  - **Properties** link: View-only access to properties with payslips, forecasts, and balance sheets
+  - **Settings** link: Management interface for property CRUD, tenant assignment, and utility provider management
+  - Navigation is divided into:
+    - **Properties Section**: View-only interface for viewing property data (payslips, forecasts, balance sheets)
+    - **Settings Section**: Management interface for property CRUD operations, tenant assignment, and utility provider management
 - **Data Management**: Ability to delete entities with confirmation dialogs
   - Delete confirmations show entity name and warn that action cannot be undone
   - All delete operations use Turbo-compatible confirmation dialogs

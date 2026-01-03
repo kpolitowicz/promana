@@ -3,7 +3,7 @@
     <div>
       <h1 class="text-3xl font-bold text-gray-900">Forecasts</h1>
       <p class="mt-1 text-sm text-gray-500">
-        Utility Provider: <%= link_to @utility_provider.name, property_utility_provider_path(@property, @utility_provider), class: "text-blue-600 hover:text-blue-800" %>
+        Utility Provider: <%= @utility_provider.name %>
       </p>
       <p class="mt-1 text-sm text-gray-500">
         Property: <%= link_to @property.name, property_path(@property), class: "text-blue-600 hover:text-blue-800" %>

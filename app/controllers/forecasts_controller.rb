@@ -40,7 +40,7 @@ class ForecastsController < ApplicationController
 
   def destroy
     @forecast.destroy
-    redirect_to property_utility_provider_path(@property, @utility_provider), notice: "Forecast was successfully deleted."
+    redirect_to property_path(@property), notice: "Forecast was successfully deleted."
   end
 
   private

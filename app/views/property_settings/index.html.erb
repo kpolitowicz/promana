@@ -1,6 +1,7 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-gray-900">Properties</h1>
+    <h1 class="text-3xl font-bold text-gray-900">Property Settings</h1>
+    <%= link_to "New Property", new_property_setting_path, class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
   </div>
 
   <% if @properties.any? %>
@@ -8,7 +9,7 @@
       <ul class="divide-y divide-gray-200">
         <% @properties.each do |property| %>
           <li>
-            <%= link_to property_path(property), class: "block hover:bg-gray-50" do %>
+            <%= link_to property_setting_path(property), class: "block hover:bg-gray-50" do %>
               <div class="px-4 py-4 sm:px-6">
                 <div class="flex items-center justify-between">
                   <p class="text-sm font-medium text-blue-600 truncate">
@@ -30,7 +31,8 @@
     </div>
   <% else %>
     <div class="text-center py-12">
-      <p class="text-gray-500">No properties yet. <%= link_to "Create one", property_settings_path, class: "text-blue-600 hover:text-blue-800" %> in Settings to get started.</p>
+      <p class="text-gray-500">No properties yet. <%= link_to "Create one", new_property_setting_path, class: "text-blue-600 hover:text-blue-800" %> to get started.</p>
     </div>
   <% end %>
 </div>
+

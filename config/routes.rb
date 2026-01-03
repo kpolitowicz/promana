@@ -10,8 +10,9 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  resources :properties do
-    resources :property_tenants, only: [:new, :create, :destroy] do
+  # Properties routes - viewing only (payslips, forecasts, balance sheets)
+  resources :properties, only: [:index, :show] do
+    resources :property_tenants, only: [] do
       resources :payslips, only: [:index, :new, :create, :show, :destroy]
       resources :tenant_payments
       resources :tenant_balance_sheets, only: [:index] do
@@ -20,7 +21,7 @@ Rails.application.routes.draw do
         end
       end
     end
-    resources :utility_providers do
+    resources :utility_providers, only: [] do
       resources :forecasts
       resources :utility_payments
       resources :utility_provider_balance_sheets, only: [:index] do
@@ -30,6 +31,13 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  # Property settings routes - management (CRUD, tenant assignment, utility provider management)
+  resources :property_settings, path: "settings/properties", controller: "property_settings" do
+    resources :property_tenants, only: [:new, :create, :destroy], controller: "property_tenants"
+    resources :utility_providers, controller: "utility_providers"
+  end
+
   resources :tenants
   resources :utility_types, only: [:index, :new, :create, :destroy]
   get "settings", to: "settings#index"

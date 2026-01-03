@@ -12,7 +12,7 @@ class PropertyTenantsController < ApplicationController
     @property_tenant.property = @property
 
     if @property_tenant.save
-      redirect_to @property, notice: "Tenant was successfully assigned to property."
+      redirect_to property_setting_path(@property), notice: "Tenant was successfully assigned to property."
     else
       @available_tenants = Tenant.where.not(id: @property.tenant_ids).order(:name)
       render :new, status: :unprocessable_content
@@ -21,13 +21,14 @@ class PropertyTenantsController < ApplicationController
 
   def destroy
     @property_tenant.destroy
-    redirect_to @property, notice: "Tenant was successfully removed from property."
+    redirect_to property_setting_path(@property), notice: "Tenant was successfully removed from property."
   end
 
   private
 
   def set_property
-    @property = Property.find(params[:property_id])
+    property_id = params[:property_id] || params[:property_setting_id]
+    @property = Property.find(property_id)
   end
 
   def set_property_tenant

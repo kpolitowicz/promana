@@ -20,7 +20,7 @@ class UtilityProvidersController < ApplicationController
 
     if @utility_provider.save
       update_utility_types
-      redirect_to property_utility_provider_path(@property, @utility_provider), notice: "Utility provider was successfully created."
+      redirect_to property_setting_path(@property), notice: "Utility provider was successfully created."
     else
       @utility_types = UtilityType.all.order(:name)
       render :new, status: :unprocessable_content
@@ -34,7 +34,7 @@ class UtilityProvidersController < ApplicationController
   def update
     if @utility_provider.update(utility_provider_params)
       update_utility_types
-      redirect_to property_utility_provider_path(@property, @utility_provider), notice: "Utility provider was successfully updated."
+      redirect_to property_setting_path(@property), notice: "Utility provider was successfully updated."
     else
       @utility_types = UtilityType.all.order(:name)
       render :edit, status: :unprocessable_content
@@ -43,13 +43,14 @@ class UtilityProvidersController < ApplicationController
 
   def destroy
     @utility_provider.destroy
-    redirect_to property_path(@property), notice: "Utility provider was successfully deleted."
+    redirect_to property_setting_path(@property), notice: "Utility provider was successfully deleted."
   end
 
   private
 
   def set_property
-    @property = Property.find(params[:property_id])
+    property_id = params[:property_id] || params[:property_setting_id]
+    @property = Property.find(property_id)
   end
 
   def set_utility_provider

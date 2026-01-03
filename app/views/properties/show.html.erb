@@ -7,17 +7,12 @@
       <% end %>
     </div>
     <div class="flex items-center gap-2">
-      <%= link_to "Edit", edit_property_path(@property), class: "bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" %>
-      <%= button_to "Delete", property_path(@property), method: :delete, data: { turbo_confirm: "Are you sure you want to delete '#{@property.name}'? This action cannot be undone." }, class: "bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded border-0 cursor-pointer" %>
       <%= link_to "Back", properties_path, class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" %>
     </div>
   </div>
 
   <div class="mt-8">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-bold text-gray-900">Tenants</h2>
-      <%= link_to "Assign Tenant", new_property_property_tenant_path(@property), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
-    </div>
+    <h2 class="text-2xl font-bold text-gray-900 mb-4">Tenants</h2>
 
     <% if @property_tenants.any? %>
       <ul class="bg-white shadow rounded-lg divide-y">
@@ -31,7 +26,6 @@
               <%= link_to "Payslips", property_property_tenant_payslips_path(@property, property_tenant), class: "text-blue-600 hover:text-blue-800 leading-none inline-block" %>
               <%= link_to "Payments", property_property_tenant_tenant_payments_path(@property, property_tenant), class: "text-blue-600 hover:text-blue-800 leading-none inline-block" %>
               <%= link_to "Balance Sheet", property_property_tenant_tenant_balance_sheets_path(@property, property_tenant), class: "text-blue-600 hover:text-blue-800 leading-none inline-block" %>
-              <%= button_to "Remove", property_property_tenant_path(@property, property_tenant), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800 leading-none inline-block border-0 bg-transparent cursor-pointer p-0" %>
             </div>
           </li>
         <% end %>
@@ -42,24 +36,20 @@
   </div>
 
   <div class="mt-8">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-bold text-gray-900">Utility Providers</h2>
-      <%= link_to "Add Utility Provider", new_property_utility_provider_path(@property), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
-    </div>
+    <h2 class="text-2xl font-bold text-gray-900 mb-4">Utility Providers</h2>
 
     <% if @property.utility_providers.any? %>
       <ul class="bg-white shadow rounded-lg divide-y">
         <% @property.utility_providers.order(:name).each do |provider| %>
           <li class="py-3 px-4 flex justify-between items-center">
             <div>
-              <%= link_to provider.name, property_utility_provider_path(@property, provider), class: "font-medium text-blue-600 hover:text-blue-800" %>
+              <span class="font-medium text-gray-900"><%= provider.name %></span>
               <span class="text-sm text-gray-500 ml-2">(<%= provider.forecast_behavior.humanize %>)</span>
             </div>
             <div class="flex items-center gap-2">
               <%= link_to "Forecasts", property_utility_provider_forecasts_path(@property, provider), class: "text-blue-600 hover:text-blue-800 leading-none inline-block" %>
               <%= link_to "Payments", property_utility_provider_utility_payments_path(@property, provider), class: "text-blue-600 hover:text-blue-800 leading-none inline-block" %>
               <%= link_to "Balance Sheet", property_utility_provider_utility_provider_balance_sheets_path(@property, provider), class: "text-blue-600 hover:text-blue-800 leading-none inline-block" %>
-              <%= button_to "Remove", property_utility_provider_path(@property, provider), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800 leading-none inline-block border-0 bg-transparent cursor-pointer p-0" %>
             </div>
           </li>
         <% end %>
