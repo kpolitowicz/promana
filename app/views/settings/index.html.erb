@@ -1,0 +1,33 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Settings</h1>
+  </div>
+
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-medium text-gray-900">Configuration</h2>
+    </div>
+    <div class="px-6 py-4">
+      <ul class="space-y-4">
+        <li>
+          <%= link_to properties_path, class: "text-blue-600 hover:text-blue-800 text-lg font-medium" do %>
+            Properties
+          <% end %>
+          <p class="text-sm text-gray-500 mt-1">Manage your properties</p>
+        </li>
+        <li>
+          <%= link_to tenants_path, class: "text-blue-600 hover:text-blue-800 text-lg font-medium" do %>
+            Tenants
+          <% end %>
+          <p class="text-sm text-gray-500 mt-1">Manage your tenants</p>
+        </li>
+        <li>
+          <%= link_to utility_types_path, class: "text-blue-600 hover:text-blue-800 text-lg font-medium" do %>
+            Utility Types
+          <% end %>
+          <p class="text-sm text-gray-500 mt-1">Manage utility types</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
