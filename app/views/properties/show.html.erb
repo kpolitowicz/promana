@@ -55,7 +55,12 @@
               <%= link_to provider.name, property_utility_provider_path(@property, provider), class: "font-medium text-blue-600 hover:text-blue-800" %>
               <span class="text-sm text-gray-500 ml-2">(<%= provider.forecast_behavior.humanize %>)</span>
             </div>
-            <%= button_to "Remove", property_utility_provider_path(@property, provider), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800 leading-none inline-block border-0 bg-transparent cursor-pointer p-0" %>
+            <div class="flex items-center gap-2">
+              <%= link_to "Forecasts", property_utility_provider_forecasts_path(@property, provider), class: "text-blue-600 hover:text-blue-800 leading-none inline-block" %>
+              <%= link_to "Payments", property_utility_provider_utility_payments_path(@property, provider), class: "text-blue-600 hover:text-blue-800 leading-none inline-block" %>
+              <%= link_to "Balance Sheet", property_utility_provider_utility_provider_balance_sheets_path(@property, provider), class: "text-blue-600 hover:text-blue-800 leading-none inline-block" %>
+              <%= button_to "Remove", property_utility_provider_path(@property, provider), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800 leading-none inline-block border-0 bg-transparent cursor-pointer p-0" %>
+            </div>
           </li>
         <% end %>
       </ul>

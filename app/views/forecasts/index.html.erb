@@ -1,0 +1,50 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Forecasts</h1>
+      <p class="mt-1 text-sm text-gray-500">
+        Utility Provider: <%= link_to @utility_provider.name, property_utility_provider_path(@property, @utility_provider), class: "text-blue-600 hover:text-blue-800" %>
+      </p>
+      <p class="mt-1 text-sm text-gray-500">
+        Property: <%= link_to @property.name, property_path(@property), class: "text-blue-600 hover:text-blue-800" %>
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <%= link_to "New Forecast", new_property_utility_provider_forecast_path(@property, @utility_provider), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+      <%= link_to "Back", property_path(@property), class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" %>
+    </div>
+  </div>
+
+  <% if @forecasts.any? %>
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issued Date</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Line Items</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @forecasts.each do |forecast| %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= forecast.issued_date.strftime('%B %d, %Y') %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= forecast.forecast_line_items.count %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_currency(forecast.forecast_line_items.sum(:amount)) %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <div class="flex items-center gap-4">
+                  <%= link_to "View", property_utility_provider_forecast_path(@property, @utility_provider, forecast), class: "text-blue-600 hover:text-blue-800" %>
+                  <%= link_to "Edit", edit_property_utility_provider_forecast_path(@property, @utility_provider, forecast), class: "text-gray-600 hover:text-gray-800" %>
+                  <%= button_to "Delete", property_utility_provider_forecast_path(@property, @utility_provider, forecast), method: :delete, data: { turbo_confirm: "Are you sure you want to delete the forecast from #{forecast.issued_date.strftime('%B %d, %Y')}? This action cannot be undone." }, class: "text-red-600 hover:text-red-800 leading-none inline-block bg-transparent border-0 p-0 cursor-pointer font-normal" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="text-gray-500">No forecasts yet. <%= link_to "Create one", new_property_utility_provider_forecast_path(@property, @utility_provider), class: "text-blue-600 hover:text-blue-800" %> to get started.</p>
+  <% end %>
+</div>
