@@ -90,36 +90,40 @@ class TenantBalanceSheetCalculator
   def update_all_missing_months
     current_month = Date.today.beginning_of_month
 
-    # Find all months that have payslips or payments
+    # Find all months that have payslips or payments (only past and current months)
     months_with_data = Set.new
 
-    # Months with payslips
+    # Months with payslips (only past and current)
     @property_tenant.payslips.pluck(:month).each do |month|
-      months_with_data << month.beginning_of_month
+      month_begin = month.beginning_of_month
+      months_with_data << month_begin if month_begin <= current_month
     end
 
-    # Months with payments
+    # Months with payments (only past and current)
     @property_tenant.tenant_payments.pluck(:paid_date).each do |paid_date|
-      months_with_data << paid_date.beginning_of_month
+      month_begin = paid_date.beginning_of_month
+      months_with_data << month_begin if month_begin <= current_month
     end
 
-    # Months with forecasts (for late-arriving forecasts)
+    # Months with forecasts (for late-arriving forecasts, only past and current)
     @property.utility_providers.each do |utility_provider|
       ForecastLineItem.joins(:forecast)
         .where(forecasts: {utility_provider_id: utility_provider.id, property_id: @property.id})
         .pluck(:due_date)
         .each do |due_date|
-          months_with_data << due_date.beginning_of_month
+          month_begin = due_date.beginning_of_month
+          months_with_data << month_begin if month_begin <= current_month
         end
     end
 
     # Update current month (allow updates)
     update_balance_sheet_for_month(current_month, allow_update: true)
 
-    # Add missing months (don't allow updates for past months)
+    # Add missing months (don't allow updates for past months, never create future months)
     months_with_data.each do |month|
       month_begin = month.beginning_of_month
       next if month_begin == current_month # Already handled above
+      next if month_begin > current_month # Never create future months
 
       update_balance_sheet_for_month(month_begin, allow_update: false)
     end

@@ -239,5 +239,24 @@ RSpec.describe TenantBalanceSheetCalculator do
       january_sheet = TenantBalanceSheet.find_by(property_tenant: property_tenant, month: january)
       expect(january_sheet.owed).to eq(1000.00) # Not updated (past month)
     end
+
+    it "does not create balance sheets for future months" do
+      future_month = Date.today.beginning_of_month + 2.months
+
+      # Create payslip for future month
+      payslip = Payslip.create!(
+        property: property,
+        property_tenant: property_tenant,
+        month: future_month,
+        due_date: Date.new(future_month.year, future_month.month, 10)
+      )
+      payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 1000.00)
+
+      calculator.update_all_missing_months
+
+      # Should not create balance sheet for future month
+      future_sheet = TenantBalanceSheet.find_by(property_tenant: property_tenant, month: future_month)
+      expect(future_sheet).to be_nil
+    end
   end
 end

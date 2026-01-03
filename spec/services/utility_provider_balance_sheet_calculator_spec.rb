@@ -89,5 +89,28 @@ RSpec.describe UtilityProviderBalanceSheetCalculator do
       expect(balance_sheet.paid).to eq(400.00)
       expect(balance_sheet.balance).to eq(100.00)
     end
+
+    it "does not create balance sheets for future months" do
+      future_month = Date.today.beginning_of_month + 2.months
+
+      # Create forecast with line item for future month
+      forecast = Forecast.create!(
+        utility_provider: utility_provider,
+        property: property,
+        issued_date: Date.today
+      )
+      ForecastLineItem.create!(
+        forecast: forecast,
+        name: "Forecast",
+        amount: 500.00,
+        due_date: Date.new(future_month.year, future_month.month, 10)
+      )
+
+      calculator.update_all_missing_months
+
+      # Should not create balance sheet for future month
+      future_sheet = UtilityProviderBalanceSheet.find_by(utility_provider: utility_provider, month: future_month)
+      expect(future_sheet).to be_nil
+    end
   end
 end
