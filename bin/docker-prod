@@ -25,21 +25,31 @@ echo "Image: $IMAGE_NAME"
 echo "Container: $CONTAINER_NAME"
 echo ""
 
+# Check if Docker is installed
+if ! command -v docker >/dev/null 2>&1; then
+  echo "ERROR: Docker is not installed or not in PATH"
+  exit 1
+fi
+
 # Ensure storage directory exists
 mkdir -p storage
 
 # Generate SECRET_KEY_BASE if not provided
 if [ -z "$SECRET_KEY_BASE" ]; then
   echo "Generating SECRET_KEY_BASE..."
-  # Try rails secret first, then openssl, then Ruby
-  if command -v rails >/dev/null 2>&1; then
-    export SECRET_KEY_BASE=$(rails secret)
+  # Try Ruby first (most reliable), then openssl, then rails as fallback
+  if command -v ruby >/dev/null 2>&1; then
+    export SECRET_KEY_BASE=$(ruby -e "require 'securerandom'; puts SecureRandom.hex(64)")
   elif command -v openssl >/dev/null 2>&1; then
     export SECRET_KEY_BASE=$(openssl rand -hex 64)
-  elif command -v ruby >/dev/null 2>&1; then
-    export SECRET_KEY_BASE=$(ruby -e "require 'securerandom'; puts SecureRandom.hex(64)")
+  elif command -v rails >/dev/null 2>&1; then
+    export SECRET_KEY_BASE=$(rails secret)
   else
-    echo "Error: Cannot generate SECRET_KEY_BASE. Please install openssl or set SECRET_KEY_BASE environment variable."
+    echo "Error: Cannot generate SECRET_KEY_BASE. Please install Ruby, openssl, or set SECRET_KEY_BASE environment variable."
+    exit 1
+  fi
+  if [ -z "$SECRET_KEY_BASE" ]; then
+    echo "Error: Failed to generate SECRET_KEY_BASE. Please set it manually."
     exit 1
   fi
   echo "SECRET_KEY_BASE generated (not shown for security)"
@@ -56,7 +66,7 @@ else
 fi
 
 # Stop and remove existing container if it exists
-if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+if docker ps -a --format '{{.Names}}' 2>&1 | grep -q "^${CONTAINER_NAME}$"; then
   echo "Stopping and removing existing container..."
   docker stop "$CONTAINER_NAME" 2>/dev/null || true
   docker rm "$CONTAINER_NAME" 2>/dev/null || true
