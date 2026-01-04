@@ -30,19 +30,19 @@
         <thead class="bg-gray-50">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><%= Payslip.name_header %></th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><%= Payslip.amount_header %></th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"><%= Payslip.amount_header %></th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <% @payslip.payslip_line_items.each do |line_item| %>
             <tr>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= line_item.name %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_currency(line_item.amount) %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right"><%= format_currency(line_item.amount) %></td>
             </tr>
           <% end %>
           <tr class="bg-gray-50 font-bold">
             <td class="px-6 py-4 whitespace-nowrap text-sm"><%= Payslip.total_header %></td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm"><%= format_currency(@payslip.total_amount) %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-right"><%= format_currency(@payslip.total_amount) %></td>
           </tr>
         </tbody>
       </table>

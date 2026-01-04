@@ -22,7 +22,7 @@
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issued Date</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Line Items</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
@@ -31,7 +31,7 @@
             <tr>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= forecast.issued_date.strftime('%B %d, %Y') %></td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= forecast.forecast_line_items.count %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_currency(forecast.forecast_line_items.sum(:amount)) %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right"><%= format_currency(forecast.forecast_line_items.sum(:amount)) %></td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
                 <div class="flex items-center gap-4">
                   <%= link_to "View", property_utility_provider_forecast_path(@property, @utility_provider, forecast), class: "text-blue-600 hover:text-blue-800" %>
