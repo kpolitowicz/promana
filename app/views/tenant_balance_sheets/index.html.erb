@@ -15,8 +15,12 @@
   <div class="mb-6 p-4 bg-white shadow rounded-lg">
     <div class="flex items-center justify-between">
       <h2 class="text-xl font-bold text-gray-900">Current Balance</h2>
-      <span class="text-2xl font-bold <%= @current_balance == 0 ? 'text-green-600' : 'text-red-600' %>">
-        <%= format_currency(@current_balance) %>
+      <span class="text-2xl font-bold <%= @current_balance == 0 ? 'text-green-600' : @current_balance > 0 ? 'text-red-600' : 'text-black' %>">
+        <% if @current_balance > 0 %>
+          -<%= format_currency(@current_balance) %>
+        <% else %>
+          <%= format_currency(@current_balance.abs) %>
+        <% end %>
       </span>
     </div>
     <% if @current_balance != 0 %>
@@ -55,8 +59,12 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <%= format_currency(balance_sheet.paid) %>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium <%= balance_sheet.balance == 0 ? 'text-green-600' : balance_sheet.balance > 0 ? 'text-red-600' : 'text-blue-600' %>">
-                <%= format_currency(balance_sheet.balance) %>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium <%= balance_sheet.balance == 0 ? 'text-green-600' : balance_sheet.balance > 0 ? 'text-red-600' : 'text-black' %>">
+                <% if balance_sheet.balance > 0 %>
+                  -<%= format_currency(balance_sheet.balance) %>
+                <% else %>
+                  <%= format_currency(balance_sheet.balance.abs) %>
+                <% end %>
               </td>
             </tr>
           <% end %>
