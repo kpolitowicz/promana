@@ -67,7 +67,7 @@ class Payslip < ApplicationRecord
     amount_col_width = amount_strings.map(&:length).max
     
     # Table header
-    lines << "-" * (name_col_width + amount_col_width + 7)
+    lines << "┌" + "-" * (name_col_width + 2) + "┬" + "-" * (amount_col_width + 2) + "┐"
     lines << "│ #{Payslip.name_header.ljust(name_col_width)} │ #{Payslip.amount_header.rjust(amount_col_width)} │"
     lines << "├" + "-" * (name_col_width + 2) + "┼" + "-" * (amount_col_width + 2) + "┤"
     
