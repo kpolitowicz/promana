@@ -5,23 +5,24 @@ RSpec.describe ApplicationHelper, type: :helper do
     before do
       Rails.application.config.currency_symbol = "$"
       Rails.application.config.currency_position = "before"
+      Rails.application.config.currency_separator = ","
     end
 
     context "with default position (before)" do
       it "formats currency with symbol before amount" do
-        expect(helper.format_currency(1234.56)).to eq("$1234.56")
+        expect(helper.format_currency(1234.56)).to eq("$1234,56")
       end
 
       it "formats currency with 2 decimal places by default" do
-        expect(helper.format_currency(100)).to eq("$100.00")
+        expect(helper.format_currency(100)).to eq("$100,00")
       end
 
       it "formats negative amounts correctly" do
-        expect(helper.format_currency(-50.25)).to eq("$-50.25")
+        expect(helper.format_currency(-50.25)).to eq("$-50,25")
       end
 
       it "allows custom precision" do
-        expect(helper.format_currency(1234.567, precision: 3)).to eq("$1234.567")
+        expect(helper.format_currency(1234.567, precision: 3)).to eq("$1234,567")
       end
     end
 
@@ -31,11 +32,11 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       it "formats currency with symbol after amount" do
-        expect(helper.format_currency(1234.56)).to eq("1234.56 $")
+        expect(helper.format_currency(1234.56)).to eq("1234,56 $")
       end
 
       it "formats negative amounts correctly" do
-        expect(helper.format_currency(-50.25)).to eq("-50.25 $")
+        expect(helper.format_currency(-50.25)).to eq("-50,25 $")
       end
     end
 
@@ -46,7 +47,21 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       it "uses the configured currency symbol" do
-        expect(helper.format_currency(100)).to eq("100.00 €")
+        expect(helper.format_currency(100)).to eq("100,00 €")
+      end
+    end
+
+    context "with different decimal separator" do
+      before do
+        Rails.application.config.currency_separator = "."
+      end
+
+      it "uses the configured decimal separator" do
+        expect(helper.format_currency(1234.56)).to eq("$1234.56")
+      end
+
+      it "formats currency with period as decimal separator" do
+        expect(helper.format_currency(100)).to eq("$100.00")
       end
     end
   end

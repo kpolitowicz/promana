@@ -156,15 +156,17 @@ See [REQUIREMENTS.md](REQUIREMENTS.md) for detailed navigation specifications.
 
 ### Currency Settings
 
-Configure currency symbol and position via environment variables:
+Configure currency symbol, position, and decimal separator via environment variables:
 
 - `CURRENCY_SYMBOL`: Currency symbol (default: "zł" for PLN)
 - `CURRENCY_POSITION`: Position relative to amount - "before" or "after" (default: "after")
+- `CURRENCY_SEPARATOR`: Decimal separator - "," or "." (default: ",")
 
 Example:
 ```bash
 export CURRENCY_SYMBOL="$"
 export CURRENCY_POSITION="before"
+export CURRENCY_SEPARATOR="."
 ```
 
 ### Payslip Labels

@@ -1,6 +1,7 @@
 module ApplicationHelper
   def format_currency(amount, precision: 2)
-    formatted_amount = number_with_precision(amount, precision: precision)
+    separator = Rails.application.config.currency_separator
+    formatted_amount = number_with_precision(amount, precision: precision, separator: separator, delimiter: "")
     symbol = Rails.application.config.currency_symbol
     position = Rails.application.config.currency_position
 
