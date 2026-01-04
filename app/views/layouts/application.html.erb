@@ -3,6 +3,8 @@
   <head>
     <title><%= content_for(:title) || "Promana" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#111827" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Promana">
     <meta name="mobile-web-app-capable" content="yes">
@@ -24,15 +26,15 @@
   </head>
 
   <body>
-    <nav class="bg-blue-600 text-white p-4 fixed top-0 left-0 right-0 z-50">
+    <nav class="bg-gray-900 text-white p-4 fixed top-0 left-0 right-0 z-50" style="background-color: #111827 !important; color: #ffffff !important;">
       <div class="container mx-auto flex items-center space-x-4">
-        <%= link_to root_path, class: "text-white flex items-center hover:text-blue-200" do %>
+        <%= link_to root_path, class: "text-white flex items-center hover:text-gray-300", style: "color: #ffffff !important;" do %>
           <img src="/icon.svg" alt="Home" width="24" height="24" class="w-6 h-6">
         <% end %>
         
         <!-- Properties Dropdown -->
         <div class="relative" data-controller="dropdown" data-action="mouseenter->dropdown#mouseEnter mouseleave->dropdown#mouseLeave">
-          <button class="hover:text-blue-200 flex items-center focus:outline-none">
+          <button class="text-white hover:text-gray-300 flex items-center focus:outline-none" style="color: #ffffff !important;">
             Properties
             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -42,7 +44,7 @@
           <div data-dropdown-target="menu" class="hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
             <% if @navbar_properties.present? %>
               <% @navbar_properties.each do |property| %>
-                <%= link_to property_path(property), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600" do %>
+                <%= link_to property_path(property), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900" do %>
                   <%= property.name %>
                 <% end %>
               <% end %>
@@ -56,7 +58,7 @@
         
         <!-- Settings Dropdown -->
         <div class="relative" data-controller="dropdown" data-action="mouseenter->dropdown#mouseEnter mouseleave->dropdown#mouseLeave">
-          <button class="hover:text-blue-200 flex items-center focus:outline-none">
+          <button class="text-white hover:text-gray-300 flex items-center focus:outline-none" style="color: #ffffff !important;">
             Settings
             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -64,13 +66,13 @@
           </button>
           
           <div data-dropdown-target="menu" class="hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-            <%= link_to property_settings_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600" do %>
+            <%= link_to property_settings_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900" do %>
               Properties
             <% end %>
-            <%= link_to tenants_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600" do %>
+            <%= link_to tenants_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900" do %>
               Tenants
             <% end %>
-            <%= link_to utility_types_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600" do %>
+            <%= link_to utility_types_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900" do %>
               Utility Types
             <% end %>
           </div>
