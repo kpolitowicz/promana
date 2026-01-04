@@ -37,6 +37,70 @@ RSpec.describe UtilityProviderBalanceSheetCalculator do
       owed = calculator.calculate_owed_for_month(month)
       expect(owed).to eq(0.0)
     end
+
+    context "with carry_forward behavior" do
+      let(:carry_forward_provider) { UtilityProvider.create!(name: "Carry Forward Provider", forecast_behavior: "carry_forward", property: property) }
+      let(:carry_forward_calculator) { UtilityProviderBalanceSheetCalculator.new(carry_forward_provider) }
+
+      it "uses amounts from last forecast when no forecast exists for the month" do
+        # Create a forecast for September 2025
+        september = Date.new(2025, 9, 1)
+        old_forecast = Forecast.create!(
+          utility_provider: carry_forward_provider,
+          property: property,
+          issued_date: september
+        )
+        ForecastLineItem.create!(
+          forecast: old_forecast,
+          name: "Forecast",
+          amount: 300.00,
+          due_date: Date.new(2025, 9, 10)
+        )
+        ForecastLineItem.create!(
+          forecast: old_forecast,
+          name: "Settlement",
+          amount: 50.00,
+          due_date: Date.new(2025, 9, 15)
+        )
+
+        # Calculate for January 2026 (no forecast exists, should carry forward)
+        january_2026 = Date.new(2026, 1, 1)
+        owed = carry_forward_calculator.calculate_owed_for_month(january_2026)
+        expect(owed).to eq(350.00) # Should use amounts from September forecast
+      end
+
+      it "returns 0 when no previous forecast exists" do
+        month = Date.today.beginning_of_month
+        owed = carry_forward_calculator.calculate_owed_for_month(month)
+        expect(owed).to eq(0.0)
+      end
+    end
+
+    context "with zero_after_expiry behavior" do
+      let(:zero_provider) { UtilityProvider.create!(name: "Zero Provider", forecast_behavior: "zero_after_expiry", property: property) }
+      let(:zero_calculator) { UtilityProviderBalanceSheetCalculator.new(zero_provider) }
+
+      it "returns 0 when no forecast exists for the month" do
+        # Create a forecast for September 2025
+        september = Date.new(2025, 9, 1)
+        old_forecast = Forecast.create!(
+          utility_provider: zero_provider,
+          property: property,
+          issued_date: september
+        )
+        ForecastLineItem.create!(
+          forecast: old_forecast,
+          name: "Forecast",
+          amount: 300.00,
+          due_date: Date.new(2025, 9, 10)
+        )
+
+        # Calculate for January 2026 (no forecast exists, should return 0)
+        january_2026 = Date.new(2026, 1, 1)
+        owed = zero_calculator.calculate_owed_for_month(january_2026)
+        expect(owed).to eq(0.0)
+      end
+    end
   end
 
   describe "#calculate_paid_for_month" do

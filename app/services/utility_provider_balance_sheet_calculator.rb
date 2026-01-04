@@ -9,11 +9,41 @@ class UtilityProviderBalanceSheetCalculator
     month_end = month.end_of_month
 
     # Sum all forecast line items that are due in this month
-    ForecastLineItem.joins(:forecast)
+    active_line_items = ForecastLineItem.joins(:forecast)
       .where(forecasts: {utility_provider_id: @utility_provider.id, property_id: @property.id})
       .where("forecast_line_items.due_date >= ? AND forecast_line_items.due_date <= ?", month_begin, month_end)
       .where("forecasts.issued_date <= ?", month_end)
-      .sum(:amount)
+
+    if active_line_items.any?
+      active_line_items.sum(:amount)
+    else
+      # No active forecast line items - apply forecast behavior
+      case @utility_provider.forecast_behavior
+      when "zero_after_expiry"
+        0.0
+      when "carry_forward"
+        # Find the most recent forecast before the target month and use its amounts
+        last_forecast = find_last_forecast(month_begin)
+        if last_forecast
+          # Use the line items from the last forecast, but adjust their due_date to the target month
+          # We need to sum the amounts from the last forecast's line items
+          last_forecast.forecast_line_items.sum(:amount)
+        else
+          0.0
+        end
+      else
+        0.0
+      end
+    end
+  end
+
+  def find_last_forecast(target_month_begin)
+    # Find the most recent forecast with line items before the target month
+    @utility_provider.forecasts.joins(:forecast_line_items)
+      .where("forecast_line_items.due_date < ?", target_month_begin)
+      .distinct
+      .order(issued_date: :desc)
+      .first
   end
 
   def calculate_paid_for_month(month)

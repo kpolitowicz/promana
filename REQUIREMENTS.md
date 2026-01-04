@@ -150,13 +150,14 @@ This application is designed to manage rental properties, tenants, and associate
   - Persisted balance sheet entries for each month showing:
     - Month (beginning of month date)
     - Due date (from earliest forecast line item for the month or default 10th of month)
-    - Owed: Sum of all forecast line item amounts due in the month
+    - Owed: Sum of all forecast line item amounts due in the month (or from last forecast for carry forward utilities when no forecast exists)
     - Paid: Sum of all utility payment amounts where paid_date falls within the month
     - Balance: Difference between owed and paid
   - Balance sheets are accessible from the utility provider show page
   - "Update" button generates missing months for older entries (never updating numbers in them) and recalculates the current month's entry
   - Current balance (sum of all balance sheet balances) is displayed at the top of the page
   - Balance sheets are ordered by due_date descending
+  - **Carry Forward Support**: For utility providers with "carry forward" behavior, when no forecast exists for a month, the balance sheet uses amounts from the most recent previous forecast (matching payslip generation behavior)
 
 ### 6. Payment Tracking & Adjustment Handling
 - **Tenant Payment Tracking**: Track payments received from tenants
