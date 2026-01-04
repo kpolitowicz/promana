@@ -10,6 +10,15 @@
       </p>
     </div>
     <div class="flex items-center gap-2">
+      <div data-controller="clipboard">
+        <textarea data-clipboard-target="source" class="hidden"><%= @payslip.to_ascii_text(@property, @property_tenant.tenant) %></textarea>
+        <button 
+          type="button"
+          data-action="click->clipboard#copy"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Copy as Text
+        </button>
+      </div>
       <%= link_to "Delete", property_property_tenant_payslip_path(@property, @property_tenant, @payslip), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" %>
       <%= link_to "Back", property_property_tenant_payslips_path(@property, @property_tenant), class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" %>
     </div>
