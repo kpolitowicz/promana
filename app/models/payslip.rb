@@ -49,6 +49,10 @@ class Payslip < ApplicationRecord
     "Czynsz"
   end
 
+  def rent_amount
+    payslip_line_items.find_by(name: Payslip.rent_label)&.amount
+  end
+
   # Generate ASCII text format of payslip for clipboard copying
   def to_ascii_text(property, tenant)
     lines = []

@@ -6,9 +6,56 @@ RSpec.describe TenantBalanceSheetCalculator do
   let(:property) { properties(:property_one) }
   let(:property_tenant) { property_tenants(:property_tenant_one) }
   let(:calculator) { TenantBalanceSheetCalculator.new(property_tenant) }
+  let(:utility_provider) { utility_providers(:utility_provider_one) }
+
+  # Create a forecast with 2 items per each month
+  # for different months starting with the given one.
+  def create_forecast!(provider, month)
+    forecast = Forecast.create!(
+      utility_provider: utility_provider,
+      property: property,
+      issued_date: Date.new(month.year, month.month, 9)
+    )
+    ForecastLineItem.create!(
+      forecast: forecast,
+      name: "Forecast",
+      amount: 100.00,
+      due_date: Date.new(month.year, month.month, 10)
+    )
+    ForecastLineItem.create!(
+      forecast: forecast,
+      name: "Other",
+      amount: 10.00,
+      due_date: Date.new(month.year, month.month, 10)
+    )
+    ForecastLineItem.create!(
+      forecast: forecast,
+      name: "Forecast",
+      amount: 200.00,
+      due_date: Date.new(month.year, month.month, 10) + 1.month
+    )
+    ForecastLineItem.create!(
+      forecast: forecast,
+      name: "Other",
+      amount: 20.00,
+      due_date: Date.new(month.year, month.month, 10) + 1.month
+    )
+    ForecastLineItem.create!(
+      forecast: forecast,
+      name: "Forecast",
+      amount: 400.00,
+      due_date: Date.new(month.year, month.month, 10) + 2.months
+    )
+    ForecastLineItem.create!(
+      forecast: forecast,
+      name: "Other",
+      amount: 40.00,
+      due_date: Date.new(month.year, month.month, 10) + 2.months
+    )
+  end
 
   describe "#calculate_owed_for_month" do
-    it "sums payslip total for the month" do
+    it "includes tenant's rent from payslip if available" do
       month = Date.today.beginning_of_month
       payslip = Payslip.create!(
         property: property,
@@ -16,46 +63,66 @@ RSpec.describe TenantBalanceSheetCalculator do
         month: month,
         due_date: Date.new(month.year, month.month, 10)
       )
-      payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 1000.00)
+      payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 800.00)
       payslip.payslip_line_items.create!(name: "Utilities", amount: 250.00)
 
       owed = calculator.calculate_owed_for_month(month)
-      expect(owed).to eq(1250.00)
+      expect(owed).to eq(800.00)
     end
 
-    it "includes late-arriving forecasts for the month" do
+    it "includes property current rent if no payslip" do
       month = Date.today.beginning_of_month
-      payslip = Payslip.create!(
-        property: property,
-        property_tenant: property_tenant,
-        month: month,
-        due_date: Date.new(month.year, month.month, 10),
-        created_at: Time.zone.parse("#{month.year}-#{month.month}-01")
-      )
-      payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 1000.00)
-
-      # Create a forecast issued after the payslip was created
-      utility_provider = utility_providers(:utility_provider_one)
-      forecast = Forecast.create!(
-        utility_provider: utility_provider,
-        property: property,
-        issued_date: Date.new(month.year, month.month, 15)
-      )
-      ForecastLineItem.create!(
-        forecast: forecast,
-        name: "Forecast",
-        amount: 200.00,
-        due_date: Date.new(month.year, month.month, 10)
-      )
-
       owed = calculator.calculate_owed_for_month(month)
-      expect(owed).to eq(1200.00) # 1000 from payslip + 200 from late forecast
+      expect(owed).to eq(1000.00)
     end
 
-    it "returns 0 when no payslip or forecasts exist" do
-      month = Date.today.beginning_of_month
-      owed = calculator.calculate_owed_for_month(month)
-      expect(owed).to eq(0.0)
+    context "when zero_after_expiry provider" do
+      it "sums forecast items for the month" do
+        month = Date.today.beginning_of_month
+
+        create_forecast!(utility_provider, month - 1.month)
+
+        owed = calculator.calculate_owed_for_month(month)
+        expect(owed).to eq(1220.00)
+      end
+
+      it "returns rent amount only if no forecast items for the month" do
+        month = Date.today.beginning_of_month
+
+        create_forecast!(utility_provider, month - 3.months)
+
+        owed = calculator.calculate_owed_for_month(month)
+        expect(owed).to eq(1000.00)
+      end
+    end
+
+    context "when carry_over provider" do
+      let(:utility_provider) { utility_providers(:utility_provider_two) }
+
+      it "sums forecast items for the month" do
+        month = Date.today.beginning_of_month
+
+        create_forecast!(utility_provider, month - 1.month)
+
+        owed = calculator.calculate_owed_for_month(month)
+        expect(owed).to eq(1220.00)
+      end
+
+      it "sums the last forecast month if no forecast items for the month" do
+        month = Date.today.beginning_of_month
+
+        create_forecast!(utility_provider, month - 3.months)
+
+        owed = calculator.calculate_owed_for_month(month)
+        expect(owed).to eq(1440.00) # count the last month where forecast was available
+      end
+
+      it "returns rent only if no forecast for that provider ever" do
+        month = Date.today.beginning_of_month
+
+        owed = calculator.calculate_owed_for_month(month)
+        expect(owed).to eq(1000.00)
+      end
     end
   end
 
@@ -96,14 +163,7 @@ RSpec.describe TenantBalanceSheetCalculator do
   describe "#update_balance_sheet_for_month" do
     it "creates a new balance sheet entry if it doesn't exist" do
       month = Date.today.beginning_of_month
-      payslip = Payslip.create!(
-        property: property,
-        property_tenant: property_tenant,
-        month: month,
-        due_date: Date.new(month.year, month.month, 10)
-      )
-      payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 1000.00)
-
+      create_forecast!(utility_provider, month)
       TenantPayment.create!(
         property_tenant: property_tenant,
         property: property,
@@ -114,9 +174,9 @@ RSpec.describe TenantBalanceSheetCalculator do
       balance_sheet = calculator.update_balance_sheet_for_month(month, allow_update: true)
 
       expect(balance_sheet).to be_persisted
-      expect(balance_sheet.owed).to eq(1000.00)
+      expect(balance_sheet.owed).to eq(1110.00)
       expect(balance_sheet.paid).to eq(800.00)
-      expect(balance_sheet.balance).to eq(200.00)
+      expect(balance_sheet.balance).to eq(310.00)
     end
 
     it "updates existing balance sheet when allow_update is true" do
@@ -130,15 +190,7 @@ RSpec.describe TenantBalanceSheetCalculator do
         paid: 500.00
       )
 
-      # Create new payslip and payment
-      payslip = Payslip.create!(
-        property: property,
-        property_tenant: property_tenant,
-        month: month,
-        due_date: Date.new(month.year, month.month, 10)
-      )
-      payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 1200.00)
-
+      create_forecast!(utility_provider, month)
       TenantPayment.create!(
         property_tenant: property_tenant,
         property: property,
@@ -149,7 +201,7 @@ RSpec.describe TenantBalanceSheetCalculator do
       updated = calculator.update_balance_sheet_for_month(month, allow_update: true)
 
       expect(updated.id).to eq(balance_sheet.id)
-      expect(updated.owed).to eq(1200.00)
+      expect(updated.owed).to eq(1110.00)
       expect(updated.paid).to eq(1000.00)
     end
 
@@ -163,15 +215,6 @@ RSpec.describe TenantBalanceSheetCalculator do
         owed: 1000.00,
         paid: 500.00
       )
-
-      # Create new payslip and payment
-      payslip = Payslip.create!(
-        property: property,
-        property_tenant: property_tenant,
-        month: month,
-        due_date: Date.new(month.year, month.month, 10)
-      )
-      payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 1500.00)
 
       result = calculator.update_balance_sheet_for_month(month, allow_update: false)
 
@@ -187,13 +230,7 @@ RSpec.describe TenantBalanceSheetCalculator do
       january = Date.new(2025, 1, 1)
       current_month = Date.today.beginning_of_month
 
-      payslip = Payslip.create!(
-        property: property,
-        property_tenant: property_tenant,
-        month: january,
-        due_date: Date.new(2025, 1, 10)
-      )
-      payslip.payslip_line_items.create!(name: Payslip.rent_label, amount: 1000.00)
+      create_forecast!(utility_provider, january)
 
       calculator.update_all_missing_months
 
@@ -203,7 +240,7 @@ RSpec.describe TenantBalanceSheetCalculator do
       january_sheet = TenantBalanceSheet.find_by(property_tenant: property_tenant, month: january)
       if january != current_month
         expect(january_sheet).not_to be_nil
-        expect(january_sheet.owed).to eq(1000.00)
+        expect(january_sheet.owed).to eq(1110.00)
       end
     end
 

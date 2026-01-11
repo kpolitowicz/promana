@@ -8,31 +8,32 @@ class TenantBalanceSheetCalculator
     month_begin = month.beginning_of_month
     month_end = month.end_of_month
 
-    # Sum all payslip line items for payslips in this month
+    # Find the rent owed on month's payslip or use the current rent amount
     payslip = @property_tenant.payslips.find_by(month: month_begin)
-    payslip_total = payslip ? payslip.total_amount : 0.0
+    rent_total = payslip ? payslip.rent_amount : @property_tenant.rent_amount
 
-    # Also include forecast line items that are due in this month
-    # This handles the edge case where forecasts come late (after payslip was generated)
-    # Include forecasts issued after the payslip was created (or all if no payslip)
     forecast_total = 0.0
     @property.utility_providers.each do |utility_provider|
-      query = ForecastLineItem.joins(:forecast)
+      total = ForecastLineItem.joins(:forecast)
         .where(forecasts: {utility_provider_id: utility_provider.id, property_id: @property.id})
         .where("forecast_line_items.due_date >= ? AND forecast_line_items.due_date <= ?", month_begin, month_end)
+        .sum(:amount)
+      if total.zero? && utility_provider.carry_forward?
+        last_forecast_month = ForecastLineItem.joins(:forecast)
+          .where(forecasts: {utility_provider_id: utility_provider.id, property_id: @property.id})
+          .maximum("forecast_line_items.due_date")
+        next unless last_forecast_month
 
-      # If payslip exists, only include forecasts issued after it was created
-      query = if payslip
-        query.where("forecasts.issued_date > ?", payslip.created_at)
-      else
-        # If no payslip, include all forecasts issued before end of month
-        query.where("forecasts.issued_date <= ?", month_end)
+        total = ForecastLineItem.joins(:forecast)
+          .where(forecasts: {utility_provider_id: utility_provider.id, property_id: @property.id})
+          .where("forecast_line_items.due_date >= ? AND forecast_line_items.due_date <= ?", last_forecast_month.beginning_of_month, last_forecast_month.end_of_month)
+          .sum(:amount)
       end
 
-      forecast_total += query.sum(:amount)
+      forecast_total += total
     end
 
-    payslip_total + forecast_total
+    rent_total + forecast_total
   end
 
   def calculate_paid_for_month(month)

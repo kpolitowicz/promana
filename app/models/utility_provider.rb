@@ -11,4 +11,8 @@ class UtilityProvider < ApplicationRecord
   validates :name, presence: true
   validates :forecast_behavior, presence: true
   validates :name, uniqueness: {scope: :property_id}
+
+  def carry_forward?
+    forecast_behavior == "carry_forward"
+  end
 end
