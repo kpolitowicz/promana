@@ -134,5 +134,15 @@ class UtilityProviderBalanceSheetCalculator
 
       update_balance_sheet_for_month(month_begin, allow_update: false)
     end
+
+    # Generate next month's row only when current month has a payment registered (even if 0)
+    current_month_end = current_month.end_of_month
+    current_month_has_payment = @utility_provider.utility_payments
+      .where("paid_date >= ? AND paid_date <= ?", current_month, current_month_end)
+      .exists?
+    if current_month_has_payment
+      next_month = current_month + 1.month
+      update_balance_sheet_for_month(next_month, allow_update: true)
+    end
   end
 end

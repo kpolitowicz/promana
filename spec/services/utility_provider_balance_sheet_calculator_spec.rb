@@ -177,4 +177,43 @@ RSpec.describe UtilityProviderBalanceSheetCalculator do
       expect(future_sheet).to be_nil
     end
   end
+
+  describe "#update_all_missing_months (next month row)" do
+    include ActiveSupport::Testing::TimeHelpers
+
+    it "creates next month balance sheet when current month has a payment registered (even if 0)" do
+      travel_to Date.new(2026, 1, 30) do
+        UtilityPayment.create!(
+          utility_provider: utility_provider,
+          property: property,
+          amount: 0.00,
+          paid_date: Date.new(2026, 1, 15)
+        )
+        Forecast.create!(
+          utility_provider: utility_provider,
+          property: property,
+          issued_date: Date.new(2025, 12, 1)
+        ).tap do |f|
+          ForecastLineItem.create!(forecast: f, name: "Feb", amount: 200.00, due_date: Date.new(2026, 2, 10))
+        end
+
+        calculator.update_all_missing_months
+
+        feb_sheet = UtilityProviderBalanceSheet.find_by(utility_provider: utility_provider, month: Date.new(2026, 2, 1))
+        expect(feb_sheet).to be_present
+        expect(feb_sheet.owed).to eq(200.00)
+        expect(feb_sheet.paid).to eq(0.00)
+      end
+    end
+
+    it "does not create next month balance sheet when current month has no payment registered" do
+      travel_to Date.new(2026, 1, 30) do
+        # No payment for January
+        calculator.update_all_missing_months
+
+        feb_sheet = UtilityProviderBalanceSheet.find_by(utility_provider: utility_provider, month: Date.new(2026, 2, 1))
+        expect(feb_sheet).to be_nil
+      end
+    end
+  end
 end
