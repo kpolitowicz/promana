@@ -70,4 +70,79 @@ RSpec.describe UtilityProvider, type: :model do
       expect(utility_provider.zero_after_expiry?).to be false
     end
   end
+
+  describe "#next_payment_owed" do
+    include ActiveSupport::Testing::TimeHelpers
+
+    let(:utility_provider) { utility_providers(:utility_provider_one) }
+
+    it "returns owed from the next month when only next month has a balance sheet row" do
+      travel_to Date.new(2026, 1, 30) do
+        UtilityProviderBalanceSheet.create!(
+          utility_provider: utility_provider,
+          property: property,
+          month: Date.new(2026, 2, 1),
+          due_date: Date.new(2026, 2, 10),
+          owed: 150.00,
+          paid: 0.00
+        )
+
+        expect(utility_provider.next_payment_owed).to eq(150.00)
+      end
+    end
+
+    it "returns current month's owed when current month has a row but next month does not" do
+      travel_to Date.new(2026, 1, 15) do
+        UtilityProviderBalanceSheet.create!(
+          utility_provider: utility_provider,
+          property: property,
+          month: Date.new(2026, 1, 1),
+          due_date: Date.new(2026, 1, 10),
+          owed: 200.00,
+          paid: 0.00
+        )
+
+        expect(utility_provider.next_payment_owed).to eq(200.00)
+      end
+    end
+
+    it "returns the next month's owed when both current and next month have rows" do
+      travel_to Date.new(2026, 1, 15) do
+        UtilityProviderBalanceSheet.create!(
+          utility_provider: utility_provider,
+          property: property,
+          month: Date.new(2026, 1, 1),
+          due_date: Date.new(2026, 1, 10),
+          owed: 100.00,
+          paid: 0.00
+        )
+        UtilityProviderBalanceSheet.create!(
+          utility_provider: utility_provider,
+          property: property,
+          month: Date.new(2026, 2, 1),
+          due_date: Date.new(2026, 2, 10),
+          owed: 250.00,
+          paid: 0.00
+        )
+
+        expect(utility_provider.next_payment_owed).to eq(250.00)
+      end
+    end
+
+    it "returns nil when neither current nor next month has a balance sheet row" do
+      travel_to Date.new(2026, 1, 15) do
+        # Only a past month row
+        UtilityProviderBalanceSheet.create!(
+          utility_provider: utility_provider,
+          property: property,
+          month: Date.new(2025, 12, 1),
+          due_date: Date.new(2025, 12, 10),
+          owed: 80.00,
+          paid: 80.00
+        )
+
+        expect(utility_provider.next_payment_owed).to be_nil
+      end
+    end
+  end
 end

@@ -15,4 +15,16 @@ class UtilityProvider < ApplicationRecord
   def carry_forward?
     forecast_behavior == "carry_forward"
   end
+
+  # Latest owed: next month's row if set, else current month's row if set, else nil.
+  # Used on property show to surface "Next payment" for utility companies.
+  def next_payment_owed
+    current_begin = Date.current.beginning_of_month
+    next_month_begin = current_begin + 1.month
+
+    utility_provider_balance_sheets
+      .where(month: [current_begin, next_month_begin])
+      .order(month: :desc) # next month first, then current
+      .first&.owed
+  end
 end
