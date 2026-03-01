@@ -21,7 +21,7 @@ RSpec.describe PayslipGenerator do
     end
 
     context "with utility provider and active forecast" do
-      let(:utility_provider) { UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property) }
+      let(:utility_provider) { UtilityProvider.create!(name: "Test Provider", property: property) }
       let(:forecast) { Forecast.create!(utility_provider: utility_provider, property: property, issued_date: Date.today) }
 
       it "includes each forecast line item individually" do
@@ -67,7 +67,7 @@ RSpec.describe PayslipGenerator do
     end
 
     context "with line item carry_forward and no active forecast" do
-      let(:provider) { UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property) }
+      let(:provider) { UtilityProvider.create!(name: "Test Provider", property: property) }
       let(:old_forecast) { Forecast.create!(utility_provider: provider, property: property, issued_date: Date.today - 2.months) }
 
       it "carries forward only items marked carry_forward: true" do
@@ -91,8 +91,8 @@ RSpec.describe PayslipGenerator do
     end
 
     context "with multiple utility providers" do
-      let(:provider1) { UtilityProvider.create!(name: "Provider 1", forecast_behavior: "zero_after_expiry", property: property) }
-      let(:provider2) { UtilityProvider.create!(name: "Provider 2", forecast_behavior: "carry_forward", property: property) }
+      let(:provider1) { UtilityProvider.create!(name: "Provider 1", property: property) }
+      let(:provider2) { UtilityProvider.create!(name: "Provider 2", property: property) }
       let(:forecast1) { Forecast.create!(utility_provider: provider1, property: property, issued_date: Date.today) }
       let(:old_forecast2) { Forecast.create!(utility_provider: provider2, property: property, issued_date: Date.today - 2.months) }
 
@@ -266,7 +266,7 @@ RSpec.describe PayslipGenerator do
     context "with forecast adjustments from previous month" do
       let(:february_2026) { Date.new(2026, 2, 1) }
       let(:march_2026) { Date.new(2026, 3, 1) }
-      let(:management_provider) { UtilityProvider.create!(name: "Management", forecast_behavior: "carry_forward", property: property) }
+      let(:management_provider) { UtilityProvider.create!(name: "Management", property: property) }
 
       context "when new forecast received after payslip was generated" do
         it "includes adjustment line item (Wyrównanie) in next month's payslip" do
@@ -376,7 +376,7 @@ RSpec.describe PayslipGenerator do
       end
 
       context "when multiple utility providers have adjustments" do
-        let(:provider2) { UtilityProvider.create!(name: "Energy Provider", forecast_behavior: "carry_forward", property: property) }
+        let(:provider2) { UtilityProvider.create!(name: "Energy Provider", property: property) }
 
         it "sums adjustments from all providers" do
           # Create February payslip

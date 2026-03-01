@@ -97,7 +97,7 @@ RSpec.describe TenantBalanceSheetCalculator do
     end
 
     context "with line item carry_forward" do
-      let(:cf_provider) { UtilityProvider.create!(name: "CF Provider", forecast_behavior: "zero_after_expiry", property: property) }
+      let(:cf_provider) { UtilityProvider.create!(name: "CF Provider", property: property) }
 
       it "carries forward only items marked carry_forward: true when no current forecast" do
         month = Date.today.beginning_of_month

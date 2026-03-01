@@ -29,7 +29,6 @@ RSpec.describe "UtilityProviders", type: :request do
           post property_setting_utility_providers_path(property), params: {
             utility_provider: {
               name: "Test Provider",
-              forecast_behavior: "zero_after_expiry",
               utility_type_ids: [utility_type1.id, utility_type2.id]
             }
           }
@@ -40,7 +39,6 @@ RSpec.describe "UtilityProviders", type: :request do
         post property_setting_utility_providers_path(property), params: {
           utility_provider: {
             name: "Test Provider",
-            forecast_behavior: "zero_after_expiry",
             utility_type_ids: [utility_type1.id, utility_type2.id]
           }
         }
@@ -51,8 +49,7 @@ RSpec.describe "UtilityProviders", type: :request do
       it "redirects to the property setting page" do
         post property_setting_utility_providers_path(property), params: {
           utility_provider: {
-            name: "Test Provider",
-            forecast_behavior: "zero_after_expiry"
+            name: "Test Provider"
           }
         }
         expect(response).to redirect_to(property_setting_path(property))
@@ -63,32 +60,23 @@ RSpec.describe "UtilityProviders", type: :request do
       it "does not create a new utility provider without name" do
         expect {
           post property_setting_utility_providers_path(property), params: {
-            utility_provider: {
-              name: "",
-              forecast_behavior: "zero_after_expiry"
-            }
+            utility_provider: {name: ""}
           }
         }.not_to change(UtilityProvider, :count)
       end
 
       it "renders the new template with errors" do
         post property_setting_utility_providers_path(property), params: {
-          utility_provider: {
-            name: "",
-            forecast_behavior: "zero_after_expiry"
-          }
+          utility_provider: {name: ""}
         }
         expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "does not create duplicate utility providers for the same property" do
-        UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property)
+        UtilityProvider.create!(name: "Test Provider", property: property)
         expect {
           post property_setting_utility_providers_path(property), params: {
-            utility_provider: {
-              name: "Test Provider",
-              forecast_behavior: "carry_forward"
-            }
+            utility_provider: {name: "Test Provider"}
           }
         }.not_to change(UtilityProvider, :count)
       end
@@ -97,7 +85,7 @@ RSpec.describe "UtilityProviders", type: :request do
 
   describe "GET /settings/properties/:property_setting_id/utility_providers/:id" do
     let(:utility_provider) do
-      UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property)
+      UtilityProvider.create!(name: "Test Provider", property: property)
     end
 
     it "renders the show template" do
@@ -115,7 +103,7 @@ RSpec.describe "UtilityProviders", type: :request do
 
   describe "GET /settings/properties/:property_setting_id/utility_providers/:id/edit" do
     let(:utility_provider) do
-      UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property)
+      UtilityProvider.create!(name: "Test Provider", property: property)
     end
 
     it "renders the edit template" do
@@ -132,20 +120,16 @@ RSpec.describe "UtilityProviders", type: :request do
 
   describe "PATCH /settings/properties/:property_setting_id/utility_providers/:id" do
     let(:utility_provider) do
-      UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property)
+      UtilityProvider.create!(name: "Test Provider", property: property)
     end
 
     context "with valid parameters" do
       it "updates the utility provider" do
         patch property_setting_utility_provider_path(property, utility_provider), params: {
-          utility_provider: {
-            name: "Updated Provider",
-            forecast_behavior: "carry_forward"
-          }
+          utility_provider: {name: "Updated Provider"}
         }
         utility_provider.reload
         expect(utility_provider.name).to eq("Updated Provider")
-        expect(utility_provider.carry_forward?).to be true
       end
 
       it "updates utility type associations" do
@@ -153,7 +137,6 @@ RSpec.describe "UtilityProviders", type: :request do
         patch property_setting_utility_provider_path(property, utility_provider), params: {
           utility_provider: {
             name: "Test Provider",
-            forecast_behavior: "zero_after_expiry",
             utility_type_ids: [utility_type2.id]
           }
         }
@@ -164,10 +147,7 @@ RSpec.describe "UtilityProviders", type: :request do
 
       it "redirects to the property setting page" do
         patch property_setting_utility_provider_path(property, utility_provider), params: {
-          utility_provider: {
-            name: "Updated Provider",
-            forecast_behavior: "carry_forward"
-          }
+          utility_provider: {name: "Updated Provider"}
         }
         expect(response).to redirect_to(property_setting_path(property))
       end
@@ -177,10 +157,7 @@ RSpec.describe "UtilityProviders", type: :request do
       it "does not update with empty name" do
         original_name = utility_provider.name
         patch property_setting_utility_provider_path(property, utility_provider), params: {
-          utility_provider: {
-            name: "",
-            forecast_behavior: "zero_after_expiry"
-          }
+          utility_provider: {name: ""}
         }
         utility_provider.reload
         expect(utility_provider.name).to eq(original_name)
@@ -188,10 +165,7 @@ RSpec.describe "UtilityProviders", type: :request do
 
       it "renders the edit template with errors" do
         patch property_setting_utility_provider_path(property, utility_provider), params: {
-          utility_provider: {
-            name: "",
-            forecast_behavior: "zero_after_expiry"
-          }
+          utility_provider: {name: ""}
         }
         expect(response).to have_http_status(:unprocessable_content)
       end
@@ -200,7 +174,7 @@ RSpec.describe "UtilityProviders", type: :request do
 
   describe "DELETE /settings/properties/:property_setting_id/utility_providers/:id" do
     let!(:utility_provider) do
-      UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property)
+      UtilityProvider.create!(name: "Test Provider", property: property)
     end
 
     it "destroys the utility provider" do

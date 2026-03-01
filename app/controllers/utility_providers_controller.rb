@@ -58,7 +58,7 @@ class UtilityProvidersController < ApplicationController
   end
 
   def utility_provider_params
-    params.require(:utility_provider).permit(:name, :forecast_behavior)
+    params.require(:utility_provider).permit(:name)
   end
 
   def update_utility_types

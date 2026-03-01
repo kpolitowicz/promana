@@ -39,7 +39,7 @@ RSpec.describe UtilityProviderBalanceSheetCalculator do
     end
 
     context "with line item carry_forward" do
-      let(:provider) { UtilityProvider.create!(name: "CF Provider", forecast_behavior: "zero_after_expiry", property: property) }
+      let(:provider) { UtilityProvider.create!(name: "CF Provider", property: property) }
       let(:cf_calculator) { UtilityProviderBalanceSheetCalculator.new(provider) }
 
       it "carries forward only items marked carry_forward: true" do
@@ -70,7 +70,7 @@ RSpec.describe UtilityProviderBalanceSheetCalculator do
     end
 
     context "with zero_after_expiry behavior" do
-      let(:zero_provider) { UtilityProvider.create!(name: "Zero Provider", forecast_behavior: "zero_after_expiry", property: property) }
+      let(:zero_provider) { UtilityProvider.create!(name: "Zero Provider", property: property) }
       let(:zero_calculator) { UtilityProviderBalanceSheetCalculator.new(zero_provider) }
 
       it "returns 0 when no forecast exists for the month" do

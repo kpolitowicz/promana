@@ -50,7 +50,6 @@
           <li class="py-3 px-4 flex justify-between items-center">
             <div>
               <span class="font-medium text-gray-900"><%= provider.name %></span>
-              <span class="text-sm text-gray-500 ml-2">(<%= provider.forecast_behavior.humanize %>)</span>
             </div>
             <div class="flex items-center gap-2">
               <%= link_to "Edit", edit_property_setting_utility_provider_path(@property, provider), class: "text-blue-600 hover:text-blue-800 leading-none inline-block" %>

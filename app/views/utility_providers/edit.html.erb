@@ -21,11 +21,6 @@
     </div>
 
     <div class="mb-4">
-      <%= form.label :forecast_behavior, "Forecast Behavior", class: "block text-gray-700 text-sm font-bold mb-2" %>
-      <%= form.select :forecast_behavior, options_for_select([["Zero After Expiry", "zero_after_expiry"], ["Carry Forward", "carry_forward"]], @utility_provider.forecast_behavior), {}, {class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"} %>
-    </div>
-
-    <div class="mb-4">
       <label class="block text-gray-700 text-sm font-bold mb-2">Utility Types</label>
       <div class="space-y-2">
         <% @utility_types.each do |utility_type| %>

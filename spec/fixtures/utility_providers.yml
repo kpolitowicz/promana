@@ -2,15 +2,12 @@
 utility_provider_one:
   name: "Test Provider 1"
   property: property_one
-  forecast_behavior: zero_after_expiry
 
 utility_provider_two:
   name: "Test Provider 2"
   property: property_one
-  forecast_behavior: carry_forward
 
 utility_provider_three:
   name: "Test Provider 3"
   property: property_two
-  forecast_behavior: zero_after_expiry
 

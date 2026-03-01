@@ -26,48 +26,27 @@ RSpec.describe UtilityProvider, type: :model do
   end
 
   describe "validations" do
-    it "is valid with name, forecast_behavior, and property" do
-      utility_provider = UtilityProvider.new(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property)
+    it "is valid with name and property" do
+      utility_provider = UtilityProvider.new(name: "Test Provider", property: property)
       expect(utility_provider).to be_valid
     end
 
     it "requires a name" do
-      utility_provider = UtilityProvider.new(forecast_behavior: "zero_after_expiry", property: property)
+      utility_provider = UtilityProvider.new(property: property)
       expect(utility_provider).not_to be_valid
       expect(utility_provider.errors[:name]).to include("can't be blank")
     end
 
-    it "requires forecast_behavior" do
-      utility_provider = UtilityProvider.new(name: "Test Provider", property: property)
-      expect(utility_provider).not_to be_valid
-      expect(utility_provider.errors[:forecast_behavior]).to include("can't be blank")
-    end
-
     it "validates uniqueness of name scoped to property_id" do
-      # Fixture already creates utility_provider_one with name "Test Provider 1" for property_one
-      # Try to create duplicate with same name
-      duplicate = UtilityProvider.new(name: "Test Provider 1", forecast_behavior: "carry_forward", property: property)
+      duplicate = UtilityProvider.new(name: "Test Provider 1", property: property)
       expect(duplicate).not_to be_valid
       expect(duplicate.errors[:name]).to be_present
     end
 
     it "allows same name for different properties" do
       property2 = properties(:property_two)
-      # Use a unique name that doesn't conflict with fixtures
-      duplicate = UtilityProvider.new(name: "Unique Provider Name", forecast_behavior: "zero_after_expiry", property: property2)
+      duplicate = UtilityProvider.new(name: "Unique Provider Name", property: property2)
       expect(duplicate).to be_valid
-    end
-  end
-
-  describe "enum" do
-    it "has forecast_behavior enum" do
-      utility_provider = UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property)
-      expect(utility_provider.zero_after_expiry?).to be true
-      expect(utility_provider.carry_forward?).to be false
-
-      utility_provider.update!(forecast_behavior: "carry_forward")
-      expect(utility_provider.carry_forward?).to be true
-      expect(utility_provider.zero_after_expiry?).to be false
     end
   end
 

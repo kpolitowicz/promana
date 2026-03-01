@@ -6,15 +6,8 @@ class UtilityProvider < ApplicationRecord
   has_many :utility_payments, dependent: :destroy
   has_many :utility_provider_balance_sheets, dependent: :destroy
 
-  enum :forecast_behavior, {zero_after_expiry: "zero_after_expiry", carry_forward: "carry_forward"}
-
   validates :name, presence: true
-  validates :forecast_behavior, presence: true
   validates :name, uniqueness: {scope: :property_id}
-
-  def carry_forward?
-    forecast_behavior == "carry_forward"
-  end
 
   # Latest owed: next month's row if set, else current month's row if set, else nil.
   # Used on property show to surface "Next payment" for utility companies.
