@@ -96,29 +96,25 @@ RSpec.describe TenantBalanceSheetCalculator do
       end
     end
 
-    context "when carry_over provider" do
-      let(:utility_provider) { utility_providers(:utility_provider_two) }
+    context "with line item carry_forward" do
+      let(:cf_provider) { UtilityProvider.create!(name: "CF Provider", forecast_behavior: "zero_after_expiry", property: property) }
 
-      it "sums forecast items for the month" do
+      it "carries forward only items marked carry_forward: true when no current forecast" do
         month = Date.today.beginning_of_month
-
-        create_forecast!(utility_provider, month - 1.month)
+        past_month = month - 1.month
+        forecast = Forecast.create!(utility_provider: cf_provider, property: property, issued_date: past_month)
+        ForecastLineItem.create!(forecast: forecast, name: "Recurring", amount: 200.00, due_date: Date.new(past_month.year, past_month.month, 10), carry_forward: true)
+        ForecastLineItem.create!(forecast: forecast, name: "Settlement", amount: 50.00, due_date: Date.new(past_month.year, past_month.month, 10), carry_forward: false)
 
         owed = calculator.calculate_owed_for_month(month)
-        expect(owed).to eq(1220.00)
+        expect(owed).to eq(1200.00) # rent 1000 + recurring 200 only
       end
 
-      it "sums the last forecast month if no forecast items for the month" do
+      it "returns rent only if no carry_forward items exist" do
         month = Date.today.beginning_of_month
-
-        create_forecast!(utility_provider, month - 3.months)
-
-        owed = calculator.calculate_owed_for_month(month)
-        expect(owed).to eq(1440.00) # count the last month where forecast was available
-      end
-
-      it "returns rent only if no forecast for that provider ever" do
-        month = Date.today.beginning_of_month
+        past_month = month - 1.month
+        forecast = Forecast.create!(utility_provider: cf_provider, property: property, issued_date: past_month)
+        ForecastLineItem.create!(forecast: forecast, name: "Settlement", amount: 50.00, due_date: Date.new(past_month.year, past_month.month, 10), carry_forward: false)
 
         owed = calculator.calculate_owed_for_month(month)
         expect(owed).to eq(1000.00)

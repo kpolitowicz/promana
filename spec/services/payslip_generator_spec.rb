@@ -66,27 +66,24 @@ RSpec.describe PayslipGenerator do
       end
     end
 
-    context "with carry_forward behavior and no active forecast" do
-      fixtures :utility_providers
+    context "with line item carry_forward and no active forecast" do
+      let(:provider) { UtilityProvider.create!(name: "Test Provider", forecast_behavior: "zero_after_expiry", property: property) }
+      let(:old_forecast) { Forecast.create!(utility_provider: provider, property: property, issued_date: Date.today - 2.months) }
 
-      let(:utility_provider) { utility_providers(:utility_provider_two) }
-      let(:old_forecast) { Forecast.create!(utility_provider: utility_provider, property: property, issued_date: Date.today - 2.months) }
+      it "carries forward only items marked carry_forward: true" do
+        ForecastLineItem.create!(forecast: old_forecast, name: "Recurring", amount: 300.00, due_date: Date.today.beginning_of_month - 5.days, carry_forward: true)
+        ForecastLineItem.create!(forecast: old_forecast, name: "Settlement", amount: 50.00, due_date: Date.today.beginning_of_month - 5.days, carry_forward: false)
 
-      it "carries forward line items from last forecast" do
-        # Update provider name to match expected format
-        utility_provider.update!(name: "Test Provider")
-        ForecastLineItem.create!(forecast: old_forecast, name: "Forecast", amount: 300.00, due_date: Date.today.beginning_of_month - 5.days)
+        result = PayslipGenerator.new(property_tenant, month: target_month).generate
 
-        generator = PayslipGenerator.new(property_tenant, month: target_month)
-        result = generator.generate
-
-        utility_item = result[:line_items].find { |item| item[:name] == "Test Provider - Forecast" }
-        expect(utility_item[:amount]).to eq(300.00)
+        recurring = result[:line_items].find { |i| i[:name] == "Test Provider - Recurring" }
+        settlement = result[:line_items].find { |i| i[:name] == "Test Provider - Settlement" }
+        expect(recurring[:amount]).to eq(300.00)
+        expect(settlement).to be_nil
       end
 
       it "excludes utility if no previous forecast exists" do
-        generator = PayslipGenerator.new(property_tenant, month: target_month)
-        result = generator.generate
+        result = PayslipGenerator.new(property_tenant, month: target_month).generate
 
         expect(result[:line_items].length).to eq(1)
         expect(result[:line_items].first[:name]).to eq(Payslip.rent_label)
@@ -101,7 +98,7 @@ RSpec.describe PayslipGenerator do
 
       it "includes all forecast line items from all providers" do
         ForecastLineItem.create!(forecast: forecast1, name: "Forecast", amount: 150.00, due_date: target_month + 5.days)
-        ForecastLineItem.create!(forecast: old_forecast2, name: "Forecast", amount: 200.00, due_date: Date.today.beginning_of_month - 5.days)
+        ForecastLineItem.create!(forecast: old_forecast2, name: "Forecast", amount: 200.00, due_date: Date.today.beginning_of_month - 5.days, carry_forward: true)
 
         generator = PayslipGenerator.new(property_tenant, month: target_month)
         result = generator.generate

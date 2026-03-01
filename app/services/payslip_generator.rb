@@ -66,21 +66,8 @@ class PayslipGenerator
     if active_line_items.any?
       active_line_items
     else
-      # No active forecast line items - apply forecast behavior
-      case utility_provider.forecast_behavior
-      when "zero_after_expiry"
-        ForecastLineItem.none
-      when "carry_forward"
-        # Find the most recent forecast before the target month
-        last_forecast = find_last_forecast(utility_provider, target_month)
-        if last_forecast
-          last_forecast.forecast_line_items
-        else
-          ForecastLineItem.none
-        end
-      else
-        ForecastLineItem.none
-      end
+      last_forecast = find_last_forecast(utility_provider, target_month)
+      last_forecast ? last_forecast.forecast_line_items.where(carry_forward: true) : ForecastLineItem.none
     end
   end
 

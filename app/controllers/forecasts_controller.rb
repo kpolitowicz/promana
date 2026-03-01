@@ -58,6 +58,6 @@ class ForecastsController < ApplicationController
   end
 
   def forecast_params
-    params.require(:forecast).permit(:issued_date, forecast_line_items_attributes: [:id, :name, :amount, :due_date, :_destroy])
+    params.require(:forecast).permit(:issued_date, forecast_line_items_attributes: [:id, :name, :amount, :due_date, :carry_forward, :_destroy])
   end
 end

@@ -17,23 +17,8 @@ class UtilityProviderBalanceSheetCalculator
     if active_line_items.any?
       active_line_items.sum(:amount)
     else
-      # No active forecast line items - apply forecast behavior
-      case @utility_provider.forecast_behavior
-      when "zero_after_expiry"
-        0.0
-      when "carry_forward"
-        # Find the most recent forecast before the target month and use its amounts
-        last_forecast = find_last_forecast(month_begin)
-        if last_forecast
-          # Use the line items from the last forecast, but adjust their due_date to the target month
-          # We need to sum the amounts from the last forecast's line items
-          last_forecast.forecast_line_items.sum(:amount)
-        else
-          0.0
-        end
-      else
-        0.0
-      end
+      last_forecast = find_last_forecast(month_begin)
+      last_forecast ? last_forecast.forecast_line_items.where(carry_forward: true).sum(:amount) : 0.0
     end
   end
 

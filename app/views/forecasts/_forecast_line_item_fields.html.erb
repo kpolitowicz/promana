@@ -11,6 +11,10 @@
     <div>
       <%= form.label :due_date, "Due Date", class: "block text-gray-700 text-sm font-bold mb-2" %>
       <%= form.date_field :due_date, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+      <div class="mt-2 flex items-center gap-2">
+        <%= form.check_box :carry_forward, class: "rounded" %>
+        <%= form.label :carry_forward, "Carry forward", class: "text-sm text-gray-700" %>
+      </div>
       <%= form.check_box :_destroy, class: "hidden" %>
       <button type="button" data-action="click->nested-form#remove" class="text-red-600 hover:text-red-800 mt-2">Remove</button>
     </div>

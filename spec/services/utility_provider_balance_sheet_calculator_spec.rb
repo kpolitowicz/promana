@@ -38,40 +38,33 @@ RSpec.describe UtilityProviderBalanceSheetCalculator do
       expect(owed).to eq(0.0)
     end
 
-    context "with carry_forward behavior" do
-      let(:carry_forward_provider) { UtilityProvider.create!(name: "Carry Forward Provider", forecast_behavior: "carry_forward", property: property) }
-      let(:carry_forward_calculator) { UtilityProviderBalanceSheetCalculator.new(carry_forward_provider) }
+    context "with line item carry_forward" do
+      let(:provider) { UtilityProvider.create!(name: "CF Provider", forecast_behavior: "zero_after_expiry", property: property) }
+      let(:cf_calculator) { UtilityProviderBalanceSheetCalculator.new(provider) }
 
-      it "uses amounts from last forecast when no forecast exists for the month" do
-        # Create a forecast for September 2025
+      it "carries forward only items marked carry_forward: true" do
         september = Date.new(2025, 9, 1)
-        old_forecast = Forecast.create!(
-          utility_provider: carry_forward_provider,
-          property: property,
-          issued_date: september
-        )
-        ForecastLineItem.create!(
-          forecast: old_forecast,
-          name: "Forecast",
-          amount: 300.00,
-          due_date: Date.new(2025, 9, 10)
-        )
-        ForecastLineItem.create!(
-          forecast: old_forecast,
-          name: "Settlement",
-          amount: 50.00,
-          due_date: Date.new(2025, 9, 15)
-        )
+        old_forecast = Forecast.create!(utility_provider: provider, property: property, issued_date: september)
+        ForecastLineItem.create!(forecast: old_forecast, name: "Recurring", amount: 300.00, due_date: Date.new(2025, 9, 10), carry_forward: true)
+        ForecastLineItem.create!(forecast: old_forecast, name: "Settlement", amount: 50.00, due_date: Date.new(2025, 9, 15), carry_forward: false)
 
-        # Calculate for January 2026 (no forecast exists, should carry forward)
         january_2026 = Date.new(2026, 1, 1)
-        owed = carry_forward_calculator.calculate_owed_for_month(january_2026)
-        expect(owed).to eq(350.00) # Should use amounts from September forecast
+        owed = cf_calculator.calculate_owed_for_month(january_2026)
+        expect(owed).to eq(300.00) # Only the recurring item
       end
 
       it "returns 0 when no previous forecast exists" do
-        month = Date.today.beginning_of_month
-        owed = carry_forward_calculator.calculate_owed_for_month(month)
+        owed = cf_calculator.calculate_owed_for_month(Date.today.beginning_of_month)
+        expect(owed).to eq(0.0)
+      end
+
+      it "returns 0 when no items are marked carry_forward" do
+        september = Date.new(2025, 9, 1)
+        old_forecast = Forecast.create!(utility_provider: provider, property: property, issued_date: september)
+        ForecastLineItem.create!(forecast: old_forecast, name: "Settlement", amount: 50.00, due_date: Date.new(2025, 9, 15), carry_forward: false)
+
+        january_2026 = Date.new(2026, 1, 1)
+        owed = cf_calculator.calculate_owed_for_month(january_2026)
         expect(owed).to eq(0.0)
       end
     end

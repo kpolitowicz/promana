@@ -18,15 +18,17 @@ class TenantBalanceSheetCalculator
         .where(forecasts: {utility_provider_id: utility_provider.id, property_id: @property.id})
         .where("forecast_line_items.due_date >= ? AND forecast_line_items.due_date <= ?", month_begin, month_end)
         .sum(:amount)
-      if total.zero? && utility_provider.carry_forward?
-        last_forecast_month = ForecastLineItem.joins(:forecast)
+      if total.zero?
+        last_cf_date = ForecastLineItem.joins(:forecast)
           .where(forecasts: {utility_provider_id: utility_provider.id, property_id: @property.id})
+          .where(carry_forward: true)
           .maximum("forecast_line_items.due_date")
-        next unless last_forecast_month
+        next unless last_cf_date
 
         total = ForecastLineItem.joins(:forecast)
           .where(forecasts: {utility_provider_id: utility_provider.id, property_id: @property.id})
-          .where("forecast_line_items.due_date >= ? AND forecast_line_items.due_date <= ?", last_forecast_month.beginning_of_month, last_forecast_month.end_of_month)
+          .where(carry_forward: true)
+          .where("forecast_line_items.due_date >= ? AND forecast_line_items.due_date <= ?", last_cf_date.beginning_of_month, last_cf_date.end_of_month)
           .sum(:amount)
       end
 
