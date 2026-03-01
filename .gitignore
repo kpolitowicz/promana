@@ -42,3 +42,6 @@
 
 # CSV data files
 /db/*.csv
+
+# Claude settings
+/.claude
