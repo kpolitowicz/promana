@@ -26,6 +26,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
               <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Carry Forward</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -34,11 +35,19 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= line_item.name %></td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right"><%= format_currency(line_item.amount) %></td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= line_item.due_date.strftime('%B %d, %Y') %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <% if line_item.carry_forward? %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">Recurring</span>
+                  <% else %>
+                    <span class="text-gray-400">One-time</span>
+                  <% end %>
+                </td>
               </tr>
             <% end %>
             <tr class="bg-gray-50 font-bold">
               <td class="px-6 py-4 whitespace-nowrap text-sm">Total</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-right"><%= format_currency(@forecast.forecast_line_items.sum(:amount)) %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm"></td>
               <td class="px-6 py-4 whitespace-nowrap text-sm"></td>
             </tr>
           </tbody>
